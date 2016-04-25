@@ -1,0 +1,62 @@
+@CHARSET "UTF-8";
+/* 1. 컨텐츠 틀 */
+.build_shape, .build_image {
+  position: relative;
+}
+
+.build_image img{ 
+  width: 500px;
+  height: auto; 
+}
+
+/* 2. x버튼 */
+#delete {
+  position: relative;
+    width: 15px;
+    height: 15px;
+    left: 495px;
+    top: 5px;
+}
+
+/* 3. 이미지 출처 */
+.build_image_origin{
+  position: absolute;
+  width: 160px;
+  height: 16px;
+  right: 0px;
+  top: 0%; 
+  font-size: xx-small;
+}
+
+/* 4. 컨텐츠 내부 내용 작성부분 */
+.build_contents{
+  width: 497px;
+  height: 150px;
+  position: relative;
+}
+
+/* li부분 스타일 없애기 */
+ul{
+  list-style: none;
+  width: 500px;
+}
+
+.file_input_div {
+    position:relative; 
+    width:80px; 
+    height:36px; 
+    overflow:hidden;
+}
+.file_input_img_btn {
+    padding:0 0 0 5px;
+}
+.file_input_hidden {
+    font-size:29px; 
+    position:absolute; 
+    right:0px; 
+    top:0px; 
+    opacity:0; 
+    filter: alpha(opacity=0); 
+    -ms-filter: alpha(opacity=0); 
+    cursor:pointer;
+}

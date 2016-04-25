@@ -1,0 +1,21 @@
+@charset "utf-8";
+
+
+.cont_hori .category_wrap {display:none;} 
+#wrap #header nav .util_menu .rank {display:none;}  
+
+
+/* 1024화면 메뉴 */ 
+
+.cont_hori .category_wrap1024 {margin:0 auto;  display:block;} 
+.cont_hori .category_wrap1024 a.open{display:block; position:relative; width:120px; height:131px; background:url('/img/menu_bt_1024.png') repeat 0 0; background-size:100% 100%; margin:0 auto; text-indent:-9999px;}  
+
+/* 1024화면 순위섹션  */  
+
+#wrap #header nav .util_menu .rank1024 {display:block;float:left;}   
+#wrap #header nav .util_menu .rank1024 a.open{display:block; width:88px; height:42px; background:url('/img/rank_bt_1024.png') repeat 0 0; background-size:100% 100%; margin:0 auto; text-indent:-9999px;}  
+
+ 
+
+.con_hori .listwrap .conwrap {width:50%; height:500px; padding:20px; float:left; box-sizing:border-box; -moz-box-sizing:border:box;} } 
+ 

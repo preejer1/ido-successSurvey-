@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+<script src="../js/web/common/jquery-ui.js"></script>
+<link rel="stylesheet" href="../css/web/common/jquery-ui.css">  
+<!-- *******   Survey js / css  ********-->
+<link rel="stylesheet" href="../css/web/common/bootstrap.min.css">  
+<link rel="stylesheet" href="../css/web/common/bootstrap-theme.min.css">  
+
+<!-- 텍스트/이미지 타입 탭 css -->
+<link rel="stylesheet" type="text/css" href="/css/web/builder/survey/tabs.css" />
+<!-- 설문조사 css -->
+<link rel="stylesheet" type="text/css" href="/css/web/builder/survey/survey.css" />
+<!-- 대질문 js 선언 -->
+<script type="text/javascript" src="../js/web/builder/survey/surveyTitleForm.js"></script>  
+<!-- 중질문 js 선언 -->
+<script type="text/javascript" src="../js/web/builder/survey/surveySecondTitleForm.js"></script>  
+<script type="text/javascript">
+  $(function() {
+    var dialog, form;
+    
+      //대질문 등록 팝업 
+      dialog = $( "#dialog-surveyTitle" ).dialog({
+          autoOpen: false,
+          height: 850,
+          width: 980,
+          modal: true,
+          buttons: {
+            "등록": insertTitle,
+            "닫기": function() {
+              $( "#dialog-surveyTitle" ).dialog( "close" );
+            }
+        },
+        close: function() {
+            //form[ 0 ].reset();
+            //allFields.removeClass( "ui-state-error" );
+          }
+     });
+   
+     //설문조사 추가 버튼
+     $( "#add-survey" ).button().on( "click", function() {
+         dialog.dialog( "open" );
+     });
+    });
+</script>
+<script type="text/javascript">
+function delete_image(i){
+  console.log(i);
+  $('[name="image_preview'+i+'"]').remove();
+}
+</script>
+<script> /*이미지 마우스 잡아서 이동하는 부분*/
+  $(function() {
+      $( '#sortable' ).sortable({
+          stop: function () {
+              var li = $('li.currentposition');
+              var nbElems = li.length;   
+              $('li.currentposition').each(function(idx) {
+                  $(this).val(idx);
+              });
+          }
+      });
+    $( "#sortable" ).disableSelection();
+  });
+</script>
+
+<style type="text/css">
+/* 1. 컨텐츠 틀 */
+.build_shape, .build_image {
+  position: relative;
+}
+
+.build_image img{ 
+  width: 500px;
+  height: auto; 
+}
+
+/* 2. x버튼 */
+#delete {
+  position: relative;
+    width: 15px;
+    height: 15px;
+    left: 495px;
+    top: 5px;
+}
+
+/* 3. 이미지 출처 */
+
+.build_image_origin{
+  position: absolute;
+  width: 160px;
+  height: 16px;
+  right: -40px;
+  top: 0%; 
+  font-size: xx-small;
+}
+
+/* 4. 컨텐츠 내부 내용 작성부분 */
+.build_contents{
+  width: 497px;
+  height: 150px;
+  position: relative;
+}
+
+/* li부분 스타일 없애기 */
+ul{
+  list-style: none;
+  width: 500px;
+}
+
+#image{
+  {display:fixed; width:59px; height:40px; background:url('/img/join_photo_in.png') repeat 0 0; background-size:100% 100%; text-indent:-9990px; margin:20px 0;}
+}
+</style>
+</head>
+<body>
+<br>
+<form action="/upload" enctype="multipart/form-data" method="post">
+    <div class="300" id="thumbnail_preview1" style="position:fixed; right:150px; top 60px;">
+    <img src="/img/join_photo_in.png"  class="img-responsive" onclick="document.all.image.click();">
+    <input type="file" accept="image/*;capture=camera" name="file" id="image" style="display: none;"/>
+    </div>
+</form>
+<!-- Survey  -->
+<button id="add-survey">설문조사 추가</button>
+  
+  <div id="dialog-surveyTitle" title="IDO RESEARCH MAKE">
+      <!-- <p class="validateTips">대질문 등록</p> -->
+    <span id="IDO-dialog-title"><h1>설문만들기</h1></span> 
+    <form>
+      <fieldset>
+        <!-- <div id="wrap"> 
+          <div id="testwrap">  -->
+            <div id="makeq" class="padding-fix">  
+              <!-- <span class="top">IDO RESEARCH MAKE </span> -->
+               <section> 
+                      <img src="../img/make_top_pic.png" alt="" /> 
+                      <h2>질문입력하기</h2>
+                      <!-- <p class="surveyTitle"> <span class="explain"> 질문을 입력해주세요.</span> </p>  -->
+                <input type="hidden" id="surveyId_title" value="">
+                <div id="titleDiv"></div>
+              </section>
+            </div> 
+            <!-- // makeq --> 
+          <!-- </div> 
+          //testwrap 
+        </div>
+        wrap --> 
+      </fieldset>
+    </form>
+  </div>
+   
+  <div id="dialog-listSurvey" title="IDO RESEARCH MAKE" style="display:none;">
+      <!-- <p class="validateTips">설문조사 리스트</p> -->
+      <span id="IDO-dialog-title"><h1>설문만들기</h1></span> 
+    <form>
+        <fieldset>
+          <div id="makeq" class="padding-fix">  
+             <input type="text" id="titleDone" name="titleDone" disabled>  
+             <section class="category"> 
+                <div class="leftPic"><img src="../img/category_title_pic.png" width="130px" height="44px"alt="카테고리분류를 선택하세요"></div> 
+                  <div class="rightSelect">
+                      <select class="category">
+                      <option>항목</option>
+                      <option>항목</option>
+                      </select>
+                  </div><!-- //rightSelect --> 
+              </section><!-- //카테고리 선택 끝 --> 
+          <section class="choiceType">
+              <input type="hidden" id="surveyId">
+            <h1> 유형선택 </h1> <span class="addtion">설문의 유형을 선택해주세요. </span> 
+            <ul> 
+              <li><a href="#" class="crown" id="btn1" onclick="button1()"><span class="offTx">순위형</span></a></li> 
+              <li><a href="#" class="star" id="btn2" onclick="button2()"><span class="offTx">별점형</span></a></li>
+              <li><a href="#" class="choice" id="btn3" onclick="button3()"><span class="offTx">이중택일형</span></a></li> 
+              <li><a href="#" class="number" id="btn4" onclick="button4()"><span class="offTx">선택형</span></a></li> 
+              <li><a href="#" class="text" id="btn5" onclick="button5()"><span class="offTx">텍스트</span></a></li>  
+            </ul>
+          </section><!-- //choiceType -->   
+            <div id="surveyDiv"><!-- 전체 div -->
+              <!-- 설문조사 insert div -->
+              <div id="listDiv"></div><!-- 설문조사 list div -->
+            </div>
+          </div>
+        </fieldset>
+      </form>
+  </div>
+<!-- Survey  --> 
+<ul id="sortable"> <!-- 컨텐츠들은 이쪽으로 들어간다. -->
+    <% if(data == null) {%>
+      <% }else {%>
+          <% for (var i = 0; i < data.length; i++) { %>
+            <li id="image_preview<%= data[i].LI_VALUE %>" name="image_preview<%= data[i].LI_VALUE %>" class="currentposition" value="<%= data[i].ORDER_NUM%>">
+              <a href="#" id="build_contents_a<%= data[i].LI_VALUE%>" onclick="active(<%= data[i].LI_VALUE%>); return false;">
+              <div class="build_shape" name="build_shape<%= data[i].LI_VALUE%>"><br> 
+                <input type="image" src="/images/util_image/x.png" id="delete" onclick="delete_image(<%= data[i].LI_VALUE%>);">
+                <div class="build_image" name="build_image<%= data[i].LI_VALUE%>"><img src="<%= data[i].CONTENTS_IMAGE_PATH %>" id="build_image<%= data[i].LI_VALUE%>" name="build_image<%= data[i].LI_VALUE%>">
+                <input type="text" class="build_image_origin" name="build_image_origin<%= data[i].LI_VALUE%>" placeholder="이미지 출처 입력" align="right" value="<%=data[i].CONTENTS_IMAGE_ORIGIN %>"></div><br>
+                <input type="text" class="build_contents" name="build_contents<%= data[i].LI_VALUE%>" value="<%= data[i].CONTENTS%>" />
+              </div>
+              </a>
+              <div style="height:200px;"></div>
+            </li>
+        <% } %>
+      <% } %>
+</ul>
+<button onclick="save()">save</button>
+<script>
+$(document).ready(function(){
+$('#image').on('change', function() { // 빌더가 하나씩 생성될때마다 name값을 +1씩 해줌.
+      var i = 0;
+      var contents_id = getUrlParameter('contentsId');
+      $.ajax({ //가장 최근에 저장되어 있는 값을 가지고 li_value 등 프로퍼티 속성값들을 지정.
+        url:'/upload/latest_value?contentsId='+contents_id+'',
+        success : function(result){
+          console.log(result);
+          if(result==0){
+            i = parseInt(result)+1;
+          }else{
+            i = result.LI_VALUE+1;
+          }
+          
+          file = $('#image').prop("files")[0];
+          blobURL = window.URL.createObjectURL(file);
+          console.log(i);
+          $('#sortable').append('<li id="image_preview'+i+'" name="image_preview'+i+'" class="currentposition"><div class="build_shape" name="build_shape'+i+'"><br>'     /* 1. 컨텐츠 틀 */
+                          +'<input type="image" src="/images/util_image/x.png" id="delete" onclick="delete_image('+i+');">' // 2. 빌더 우측 x 그림부분 X버튼 변경을 원하면 src 부분 수정 / onclick부분은 현재 만들어진  name값의 빌더를 지우는 function
+                            +'<div class="build_image" name="build_image'+i+'"><img src='+blobURL+' name="build_image'+i+'">' // 파일 선택 후 이미지 화면 출력
+                              +'<input type="text" class="build_image_origin" name="build_image_origin'+i+'" placeholder="이미지 출처 입력" align="right"></div><br>' // 3. 이미지 출처
+                            +'<input type="text" class="build_contents" name="build_contents'+i+'"/>' // 4. 컨텐츠 내부 내용 작성부분 
+                            +'<button id="button'+i+'" onclick="save_image('+i+')">저장</button>'
+                          +'</div>'
+                          +'<div style="height:200px;"></div></li>'); //컨텐츠와 컨텐츠 사이의 간격을 위해 만든 <div>
+          
+            $('li.currentposition').each(function(idx) { //li생성될때마다 value값 지정.
+                $(this).val(idx);
+            });
+        }
+      })
+      
+      
+  });
+})
+</script>
+<script type="text/javascript">
+  function getUrlParameter(sParam){ //View에 URL에 접근하여 get parameter값을 가져옴
+    var sPageURL = window.location.search.substring(1);
+      var sURLVariables = sPageURL.split('&');
+      for (var i = 0; i < sURLVariables.length; i++) 
+      {
+          var sParameterName = sURLVariables[i].split('=');
+          if (sParameterName[0] == sParam) 
+          {
+              return sParameterName[1];
+          }
+      }
+  }
+
+  function save_image(i){ //저장버튼을 누르면
+    $('#button'+i+'').remove(); //저장버튼 삭제
+    $('div[name=build_shape'+i+']').wrap('<a href="#" id="build_contents_a'+i+'" onclick="active('+i+'); return false;"></a>'); //image_preview li 부분을 a링크로 감싸버린다.
+    $("input[name=build_image_origin"+i+"]").attr("readonly",true); //a 링크로 감싸면서 input tag를 못쓰도록 함.
+    $("input[name=build_contents"+i+"]").attr("readonly",true); //a 링크로 감싸면서 input tag를 못쓰도록 함.
+      
+    var file = $('#image').prop("files")[0]; //파일
+    var build_image_origin = $('input[name=build_image_origin'+i+']').val(); //이미지 출처
+    var build_contents = $('input[name=build_contents'+i+']').val(); // contents의 내용
+    var contents_id = getUrlParameter('contentsId'); // thumbnail에서 가져온 contents_id값 / DB에서 쿼리를 확인할 때 contents_id값으로 확인해야하므로 필요함.
+    var order = $('[name="image_preview'+i+'"]').val(); //미리저장시 순서확인을 위한 변수
+    var fd = new FormData();
+    console.log('iiiiiiiiiii: '+i);
+    console.log($('input[name=build_image_origin'+i+']').val());
+
+    fd.append('li_value', i);
+    fd.append('file', file); 
+    fd.append('order', order); //순서
+    fd.append('contents_id', contents_id); //컨텐츠 ID
+    fd.append('build_image_origin', build_image_origin); //이미지 출처
+    fd.append('build_contents', build_contents); //컨텐츠 내용
+
+    console.log('li_value : '+i);
+    console.log('order : '+order);
+    console.log('contents_id : '+contents_id);
+    console.log('build_image_origin : '+build_image_origin);
+    console.log('build_contents : '+build_contents);
+
+   $.ajax({
+      url: '/upload/builder_contents',
+      data: fd,
+      processData: false,
+      contentType: false,
+      async : false,
+      type: 'POST',
+      success: function(){
+        console.log('success');
+      }
+    });
+
+  }
+
+  function active(i){ //저장버튼 누른 후 수정을 원할시
+    console.log('활성화');
+    $('div[name=build_shape'+i+']').unwrap(); //감싸있는 a 태그 삭제
+    $('input[name=build_contents'+i+']').after('<button id="r_button'+i+'" onclick="revise_image('+i+')">저장</button>');
+    $("input[name=build_image_origin"+i+"]").attr("readonly",false); //a 링크로 감싸면서 input tag를 못쓰도록 함.
+    $("input[name=build_contents"+i+"]").attr("readonly",false); //a 링크로 감싸면서 input tag를 못쓰도록 함.
+  }
+
+  //수정후 다시 저장 function
+  function revise_image(i){
+    $('#r_button'+i+'').remove(); //저장버튼 삭제
+    $('div[name=build_shape'+i+']').wrap('<a href="#" id="build_contents_a'+i+'" onclick="active('+i+')"></a>'); //image_preview li 부분을 a링크로 감싸버린다.
+    $("input[name=build_image_origin"+i+"]").attr("readonly",true); //a 링크로 감싸면서 input tag를 못쓰도록 함.
+    $("input[name=build_contents"+i+"]").attr("readonly",true); //a 링크로 감싸면서 input tag를 못쓰도록 함.
+    
+    var file = $('#image').prop("files")[0]; //파일
+  
+    var build_image_origin = $('input[name=build_image_origin'+i+']').val(); //이미지 출처
+    var build_contents = $('input[name=build_contents'+i+']').val(); // contents의 내용
+    var contents_id = getUrlParameter('contentsId'); // thumbnail에서 가져온 contents_id값 / DB에서 쿼리를 확인할 때 contents_id값으로 확인해야하므로 필요함.
+    var order = $('[name="image_preview'+i+'"]').val(); //미리저장시 순서확인을 위한 변수
+    var fd = new FormData();
+    fd.append('file', file); 
+    fd.append('order', order); //순서
+    fd.append('contents_id', contents_id); //컨텐츠 ID
+    fd.append('build_image_origin', build_image_origin); //이미지 출처
+    fd.append('build_contents', build_contents); //컨텐츠 내용
+    
+    console.log(file);
+    console.log(order);
+    console.log(contents_id);
+    console.log(build_image_origin);
+     $.ajax({
+        url: '/upload/revise_builder_contents',
+        data: fd,
+        processData: false,
+        contentType: false,
+        type: 'POST',
+        success: function(data){
+          alert("EE");
+        }
+      });
+  }
+</script>
+
+</body>
+</html>

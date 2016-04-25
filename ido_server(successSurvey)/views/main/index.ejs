@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+
+
+<title>아이두</title>
+
+
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="keywords" content="IDO" />
+<meta name="description" content="IDO" />
+<meta name="author" content="IDO.COM" />
+
+<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+<link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel='stylesheet' type='text/css'> 
+<!-- http://ionicons.com/ --> 
+
+<link rel="stylesheet" type="text/css" href="css/web/main/common1.css" />
+<link rel="stylesheet" href="css/web/main/layout1024.css" media="screen and (max-width:1024px)">
+<link rel="stylesheet" href="css/web/main/mobile.css" media="screen and (max-width:600px)">
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script type="text/javascript" src="js/web/common/jquery-modal/jquery.modal.js"></script>
+<link rel="stylesheet" type="text/css" href="js/web/common/jquery-modal/jquery.modal.css" />
+
+
+<script type="text/javascript">
+  ////////////////////////////////////////////////////////////////////////////////////////
+    //이미지 처음 로딩될 때 함수 호출
+    call_image(0);
+    
+    //이미지로딩 서버로 요청
+    function call_image(no){
+      console.log('받는값 no::'+no);
+      $.ajax({
+        url : 'http://172.16.75.5:5555/main_contents?no='+no+'',
+        type : 'GET',
+        success : function(data) {
+  
+          //처음 이미지 로딩 할 때 - no값 초기화 선언
+          var no = 0;
+          
+          //서버에서 데이터 응답받아 이미지 여러개 가져옴
+          for(var i in data.contents){
+
+            if(data.contents[i].IMAGE_TYPE == 'type2'){
+            $('.listwrap').append('<div class="conwrap">'+
+                                    '<div class="liststyle03">'+
+                                    '<div class="con">'+
+                                    '<p class="category_tx"><img src="img/list_category_icon.png" alt="카테고리">요리'+
+                                    '<span class="ion-ios-arrow-right"></span>레시피 </p>'+
+                                    '<div class="title">'+
+                                    '<h2 class="style02">'+data.contents[i].TITLE+'</h2>'+
+                                    '</div>'+
+                                    '<div class="detail">'+
+                                    '<h3 class="style02"> 야식이 너무 땡기는 날! 오늘은 어떤 야식 드시고 싶으세요? 글이 넘친다 세로 조절은? </h3>'+
+                                    '<a href="/view_contents?contentsId='+data.contents[i].CONTENTS_ID+'" class="conopen" rel="modal:open" id="ii'+i+'">글 열기 </a></div>'+
+                                    '</div>'+
+                                    '<div class="bgpic"><img src="'+data.contents[i].THUMBNAIL_IMAGE_PATH+'" alt=""></div>'+
+                                    '<div class="dateinfo">'+
+                                    '<img src="img/list_calendar_icon.png" alt=""> 2016.02.28<img src="img/list_reply_icon.png" alt="">  12121212'+
+                                    '</div></div></div>');
+            }else{
+            console.log(data.contents[i].IMAGE_TYPE)
+            //body에 img 뿌려줌
+            $('.listwrap').append('<div class="conwrap">'+
+                          '<div class="liststyle01">'+
+                            '<p class="category_tx">'+
+                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_category_icon.png" alt="카테고리" /> 요리'+
+                              '<span class="ion-ios-arrow-right"></span>  레시피'+ 
+                            '</p>'+
+                            '<div class="title">'+
+                              '<h2>'+data.contents[i].TITLE+'</h2>'+
+                            '</div>'+
+                            '<p class="mainpic">'+
+                              '<img src="'+data.contents[i].THUMBNAIL_IMAGE_PATH+'" id='+data.contents[i].CONTENTS_ID+' alt="입력된 이미지" />'+
+                            '</p>'+
+                            '<div class="detail">'+
+                              '<h3> 야식이 너무 땡기는 날! 오늘은 어떤 야식 드시고 싶으세요? 글이 넘친다 세로 조절은? </h3>'+
+                              '<a href="/view_contents?contentsId='+data.contents[i].CONTENTS_ID+'" class="conopen" rel="modal:open"> 글 열기 </a>'+
+                            '</div>'+
+                            '<div class="dateinfo">'+
+                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_calendar_icon.png" alt="" /> 2016.02.28'+
+                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_reply_icon.png" alt="" />12121212'+
+                            '</div>'+
+                          '</div>'+
+                          '</div>');
+            //서버에서 받은 no 값을 변수에 담음  - 이 후 무한 스크롤에 다음 no값을 가져오기 위해서
+            var chg_no = data.no;
+            }
+
+          }//for
+          
+          //계속 변경되는 no값 - 아래에서 hidden으로 no값을 줌
+          $('#chg_no').val(chg_no);
+          
+          console.log('이미지 로딩 success! 다음 chg_no값:::'+ chg_no);
+        }
+      });
+    }
+   
+    
+    //무한 스크롤 구현
+    $(window).scroll(function() {
+      chg_no = $("#chg_no").val();
+      console.log(chg_no);
+      //          스크롤의 위치값        윈도우의 크기
+      var scrollHeight = $(window).scrollTop() + $(window).height();
+      //현재페이지(문서)의 높이
+      var documentHeight = $(document).height();
+
+      //alert('scrollHeight:'+scrollHeight+'documentHeight:'+documentHeight);
+      
+      //스크롤 위치값과 현재문서 높이가 같으면 = 스크롤을 끝까지 내리면 
+      if(scrollHeight == documentHeight) {
+        //이미지 로딩 함수 호출
+        call_image(chg_no);
+        
+        console.log('받는 값 chg_no::::'+chg_no);
+      }//if
+    });
+    ///////////////////////////////////////////////////////////////////////////////////////
+    
+
+</script>
+<script type="text/javascript" src="js/web/main/common/jquery.min.js"></script> 
+<script type="text/javascript" src="js/web/main/common/common.js"></script> 
+<script type="text/javascript" src="js/web/main/common/jquery.blockUI.js"></script> 
+
+
+<script type="text/javascript">
+  var hLocation = location.href;
+  if (hLocation.indexOf("localhost") == -1 && hLocation.indexOf("112.171.37.6") == -1) {
+    var mobileKeyWords = new Array('iPhone', 'iPod', 'BlackBerry', 'Android', 'Windows CE', 'LG', 'MOT', 'SAMSUNG', 'SonyEricsson');
+    for (var word in mobileKeyWords){
+        if (navigator.userAgent.match(mobileKeyWords[word]) != null){
+          if(hLocation.indexOf("mobile_index.html") == -1) {
+              location.href = "mobile_index.html";
+              break;
+          }
+        }
+    }
+  }
+</script>
+
+
+
+
+</head>
+
+<body>
+
+<div id="wrap">
+<input type="hidden" id="u_mail">
+<input type="hidden" id="u_pw">
+<input type="hidden" id="u_sex">
+<input type="hidden" id="u_nickName">
+
+<!-- 레이어 위에 내용 --> 
+ <div id="joinContain">
+  <a href="#" class="joinClose" id="joinoff">창닫기</a></div> 
+ <div class="contentpop_wrap"> 
+
+  Loding ... 
+ 
+  <a href="#" class="close" id="contentClose">닫기</a> 
+  
+
+ </div> 
+ <!-- contentpop_wrap --> 
+<!-- //contentpop_bg --> 
+<!-- //레이어 위에 내용 --> 
+  <!-- skip start --> 
+  <div class="skipNavi">
+      <ul>
+          <li><a href="#container">본문 바로가기</a></li>
+          <li><a href="#header">주메뉴 바로가기</a></li>
+           
+      </ul>
+  </div>
+  <!-- //skip  --> 
+       
+
+  <!-- menu --> 
+<div id="menu_nav">
+    <span class="close_bt"><a href="#" class="menu_close" id="closemm">메뉴닫기</a></span> 
+    <!-- 비로그인 --> 
+      <p class="userTx"><img src="img/logo.png" alt="logo" /></p>  
+      <p class="titleTx">로그인</p> 
+
+      <input placeholder="id">
+          <div style="width:100%;height:30px;"> 이메일이 틀렸습니다. </div>  
+      <input placeholder="pass">
+
+      <!-- //비로그인 --> 
+         
+      <a href="#" class="facebook_log padding-fix">페이스북 로그인</a>  
+      <a href="#" class="kakao_log padding-fix">카카오톡 로그인</a>  
+
+      <ul class="login">
+       <li> <a href="#">로그인</a> </li> 
+       <li class="padding-fix"> <a href="#" id="joinOpen">IDO 계정만들기</a> </li> 
+
+      </ul>
+
+
+      <p class="findpw"><img src="img/main_findpw_icon.png" alt=""/> <a href="#">아이디/비밀번호 찾기</a> </p> 
+      
+      <p class="askadmin"> <a href="#" class="asklink"> 제휴문의</a> <br /><a href="#" class="asklink">Q_A</a> </p> 
+</div>
+      <!-- //menu_nav -->    
+
+
+   <!-- header --> 
+   <section id="header"> 
+      <nav> 
+         <h1><a href="#"><img src="img/logo.png" alt="logo"></a></h1> 
+          <div class="util_search"> 
+             <div class="search_btLeft"><a href="#" class="searchOpen" id="openSearch">검색열기 </a></div>  
+             <div class="search_div"><input placeholder="검색어를 입력하세요"></div> 
+          </div> 
+         <!-- //util_search --> 
+         <div class="util_menu"> 
+    
+             <div class="rank"> 
+
+                <div class="rank_content_wrap"> 
+  
+                     <ul>
+                      <li> <span class="numberbg">1</span></li> 
+                      <li> 순위제목 글자가 넘치면 짤라주세요</li> 
+                      <li> <span class="number_move"><span class="ion-arrow-down-b" data-pack="default" data-tags=""></span> 2</span></li> 
+                    </ul> 
+                </div> 
+                <!-- //rank_content_wrap -->
+
+               <div class="rank_add_wrap"> 
+                
+                <ul> 
+                 <li>1</li> 
+                 <li>보관함에 담아두어야 할 취업사이트</li> 
+                 <li><span class="ion-arrow-up-b" data-pack="default" data-tags=""></span> 2</span></li>
+                </ul> 
+                
+                <ul> 
+                 <li>2</li> 
+                 <li>글이 가로 너비를 넘어가면 점으로 짜름 글이 가로 너비를 넘으면</li> 
+                 <li><span class="ion-minus" data-pack="default" data-tags=""></span> 0</span></li>
+                </ul> 
+
+                <ul> 
+                 <li>3</li> 
+                 <li>짧은 제목의 경우</li> 
+                 <li><span class="ion-arrow-down-b" data-pack="default" data-tags=""></span> 99</span></li>
+                </ul> 
+
+                <ul> 
+                 <li>4</li> 
+                 <li>공백포함 23자정도가 딱 맞는 길이</li> 
+                 <li><span class="ion-arrow-down-b" data-pack="default" data-tags=""></span> 2</span></li>
+                </ul> 
+
+                <ul> 
+                 <li>5</li> 
+                 <li>보관함에 담아두어야 할 취업사이트</li> 
+                 <li><span class="ion-arrow-up-b" data-pack="default" data-tags=""></span> 2</span></li>
+                </ul> 
+
+                <p class="more"><a href="#">더보기</a></p>    
+               </div>
+
+               <!-- //rank_add_wrap --> 
+             </div>
+             <!-- //rank --> 
+           
+
+
+
+               <!-- 랭크섹션 1024 -->  
+
+
+               <div class="rank1024"> 
+
+
+                  <a href="#" class="open">랭크열기</a> 
+
+               </div> 
+               <!-- //rank1024 --> 
+
+                
+
+
+                <!--// 랭크섹션 1024 -->  
+
+             <div class="menu"> 
+               <a href="#" class="menuOpen" id="menutest"> 메뉴열기 </a> 
+             </div> 
+             <!-- //menu --> 
+         
+  
+         
+         </div> 
+         <!-- //util_search --> 
+
+           
+
+      
+      </nav> 
+      
+
+   <div id="mask"></div> 
+  
+
+   </section> 
+   <!-- //header --> 
+ 
+
+ 
+
+      <section id="content"> 
+      
+        
+        <div class="top_area list_04"> <!-- slide list list_01 ~ list_04 -->
+        <ul class="slide_top">
+        
+          
+            
+              
+              
+                <li class="first" >
+              
+            
+              <p> <span> </span> </p>
+              <img src="img/main_01.png" alt="">
+            </li>           
+          
+            
+              
+              
+                <li class="" >
+              
+            
+              <p> <span> </span> </p>
+              <img src="img/main_02.png" alt="">
+            </li>           
+          
+            
+              
+              
+                <li class="" >
+              
+            
+              <p> <span> </span> </p>
+              <img src="img/main_03.png" alt="">
+            </li>           
+          
+            
+              
+              
+                <li class="" >
+              
+            
+              <p> <span> </span> </p>
+              <img src="img/main_04.png" alt="">
+            </li>           
+                  
+        </ul>
+      </div>
+            
+       <!-- News -->
+      <div class="cont_hori con_top">
+            
+             <div class="category_wrap"> 
+         
+                 <!-- 패션,뷰티 --> 
+                 <div class="category01"> 
+                   
+                     <div class="ca_count">1233</div>
+                     <a href="#" class="gorygo">패션뷰티 카테고리 이동</a> 
+                   
+                 </div> 
+                 <!-- //패션뷰티 --> 
+                 
+
+
+        <!-- 음식여행 --> 
+                 <div class="category02"> 
+                   
+                     <div class="ca_count">10</div>
+                     <a href="#" class="gorygo">음식여행카테고리 이동 </a>   
+                   
+                 </div> 
+               <!-- //음식여행 --> 
+                 
+                 
+        <!-- 취미게임 --> 
+                 <div class="category03"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">취미게임카테고리 이동 </a>   
+                   
+                 </div> 
+               <!-- //취미게임 --> 
+                 
+               <!-- 생활쇼핑 --> 
+                 <div class="category04"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">생활쇼핑카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- //생활쇼핑 --> 
+                                  
+                                  
+               <!-- 정치교육 --> 
+                 <div class="category05"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">정치교육카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- //정치교육 -->                                   
+
+
+
+               <!-- 디지털가전 --> 
+                 <div class="category06"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">디지털가전카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- //디지털가전 -->  
+               
+         <!-- 자동차교통 --> 
+                 <div class="category07"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">자동차교통카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- //자동차교통 -->  
+                                 
+                                 
+        <!-- 방송연예 --> 
+                 <div class="category08"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">방송연예카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- //방송연예 -->   
+               
+        <!-- 스포츠건강 --> 
+                 <div class="category09"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo">스포츠건강카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- //스포츠건강 -->                                                  
+                                 
+ 
+        <!-- 유저이슈 --> 
+                 <div class="category10"> 
+                   
+                     <div class="ca_count">999</div>
+                     <a href="#" class="gorygo"> 유저이슈카테고리 이동</a>   
+                   
+                 </div> 
+               <!-- // 유저이슈 -->                                      
+                                 
+                  
+                  
+                  </div> 
+                  <!-- // category_wrap --> 
+
+
+
+                  <!-- 1024 화면 메뉴 --> 
+
+                   <div class="category_wrap1024"> 
+
+                   <a href="#" class="open">메뉴열기</a>  
+
+                   </div> 
+                   <!-- /category_wrap1024 --> 
+
+                  <!--// 1024 화면 메뉴 --> 
+                  
+      </div>
+      <!-- //News -->
+     
+            
+            
+            <div class="con_hori">
+              
+
+               <div class="listwrap">
+             
+
+                  
+
+          <div id="contentcall">      
+                  
+                   <!-- 리스트스타일 1 div 1  --> 
+                  
+              <input type="hidden" id="chg_no"  value=""/>         
+
+                     
+
+
+
+ 
+                  
+
+
+
+
+
+            
+            </div> 
+            <!-- //list --> 
+           
+            
+            
+            
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+      
+      
+      
+      </section> 
+      <!-- //content --> 
+
+</div> 
+<!-- //wrap --> 
+
+      <script type="text/javascript" src="js/web/main/common/jquery.bxslider.js"></script>
+      <script>
+        
+      window.onload = function(){
+          
+          /* market */
+          var market_slider = {
+              option : {
+                auto:true,
+                mode: 'horizontal',
+                autoControls:true,
+                pager:true,
+                controls: true,
+                slideWidth:640
+              },
+              init : function() {
+                
+                if (this.obj == undefined) {
+                
+                  this.obj = $('.slide_app').bxSlider(this.option);
+                
+                } else {
+                  
+                  this.option.startSlide = this.obj.getCurrentSlide();
+                  this.obj.reloadSlider(this.option);
+                  
+                }
+              }   
+            };    
+          
+          /* uvi_info */
+          $('.uvi_slide').each(function(i){
+            
+            var $this = $(this);
+            
+            if ($this.find(".t_wrap").length > 1) {
+              $this.bxSlider({
+                auto:false,
+                mode: 'horizontal',
+                autoControls:false,
+                pager:true,
+                controls: true,
+                slideWidth:640
+              });
+            }
+            
+          });
+    
+          
+          /* Top_slide */
+          var top_slider = {
+              
+            option : {
+              auto:true,
+              speed:900,
+              autoControls:true,
+              pager:true,
+              onSlideAfter:function($slideElement, oldIndex, newIndex){
+                
+                $('.slide_top li').removeClass('active');
+                $('.slide_top li').eq(newIndex+1).addClass('active');
+                
+              }
+            },
+            m_option : function(){
+              if (this._m_option == undefined) {
+                
+                this._m_option = {};
+                
+                $.extend(this._m_option, this.option);
+                
+                this._m_option.mode = "horizontal";
+                
+              } else {
+                
+                this._m_option.startSlide = this.obj.getCurrentSlide();
+                
+              }
+              return this._m_option;
+            },
+            pc_option : function(){
+              if (this._pc_option == undefined) {
+                
+                this._pc_option = {};
+                
+                $.extend(this._pc_option, this.option);
+                
+                this._pc_option.mode = "vertical";
+                this._pc_option.pause = 7000;
+                
+              } else {
+                
+                this._pc_option.startSlide = this.obj.getCurrentSlide();
+                
+              }
+              return this._pc_option;
+            },
+            init : function(type) {
+              if (this.obj == undefined) {
+                
+                if (type == "mobile") {
+                
+                  this.obj = $('.slide_top').bxSlider(this.m_option());
+                  
+                } else {
+                  
+                  this.obj = $('.slide_top').bxSlider(this.pc_option());
+                  
+                }
+
+              } else {
+                
+                if (type == "mobile") {
+                  this.obj.reloadSlider(this.m_option());
+                } else {
+                  this.obj.reloadSlider(this.pc_option());
+                }
+              }
+            }   
+          };        
+    
+          
+          var lastWidth = 0;
+          
+          var resize = function() {
+            
+            market_slider.init();
+            
+            var currentWidth = $(this).width();
+            if(lastWidth==0){
+              //initial
+              var status = currentWidth<753 ? 'mobile' : (currentWidth>=753 ? 'pc' : '');
+            }else{
+              var status = currentWidth < lastWidth ? 'mobile' : (currentWidth > lastWidth ? 'pc' : '');
+            }
+            
+            if(status=='mobile' && currentWidth < 753 && (lastWidth > 753 || lastWidth == 0) ){
+              // Mobile
+    
+              /* slide_controll */
+              top_slider.init("mobile");
+    
+            }else if(status=='pc' && currentWidth >= 753  && (lastWidth < 753 || lastWidth==0) ){
+              // PC
+    
+              /* slide_controll */
+              top_slider.init("pc");
+              
+            }
+            
+            lastWidth = currentWidth;
+           
+          }
+    
+          
+          $(window).resize(function(){
+           resize();
+          }).triggerHandler('resize');
+        
+      
+          $(".slide_top li.first").addClass("active");
+          
+          enableSelectBoxes();
+          
+        }
+
+        
+        function enableSelectBoxes(){
+
+          $('div.selectBox').each(function(){
+            $(this).children('span.selected').html($(this).children('div.selectOptions').children('span.selectOption:first').html());
+            $(this).attr('value',$(this).children('div.selectOptions').children('span.selectOption:first').attr('value'));
+
+            $(this).children('span.selected,span.selectArrow').click(function(){
+              if($(this).parent().children('div.selectOptions').css('display') == 'none'){
+                $(this).closest('.search').find('div.selectOptions').css('display','none');
+                $(this).parent().children('div.selectOptions').css('display','block');
+              }else{
+                $(this).parent().children('div.selectOptions').css('display','none');
+              }
+            });
+            
+            $(this).find('span.selectOption').click(function(){
+              $(this).parent().css('display','none');
+              $(this).closest('div.selectBox').attr('value',$(this).attr('value'));
+              $(this).parent().siblings('span.selected').html($(this).html());
+            });
+          });
+        }
+      </script>
+</body>
+</html>
+          
+            
