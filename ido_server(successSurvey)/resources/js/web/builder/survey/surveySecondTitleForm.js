@@ -27,7 +27,7 @@
 	function selectSurveyTitle(){
 		$.ajax({
 			//url : '/selectTempStore?surveyId='+$('#surveyId_title').val()+'',
-			url : '/listSurveySecondTitle?surveyId='+$('#surveyId').val()+'',
+			url : '/upload/listSurveySecondTitle?surveyId='+$('#surveyId').val()+'',
 			type : 'GET',
 			success : function(data){
 				console.log(data);
@@ -37,10 +37,10 @@
 					i = parseInt(i);  
 					
 					//답변 타입 텍스트:1, 이미지:2
-					var answerType = data.title[i].survey_answer_type;
+					var answerType = data.title[i].SURVEY_ANSWER_TYPE;
 					
 					//설문 유형 타입
-					var surveyType = data.title[i].survey_type;
+					var surveyType = data.title[i].SURVEY_TYPE;
 					var surveyTypeTxt = '';
 					if(surveyType=='1'){
 						surveyTypeTxt = '순위형';
@@ -56,31 +56,44 @@
 					
 					//설문조사 조회 
 				 	var selectSurvey = ''+
-				 					'<div style="margin-left:190px;"><img class="deleteSurveyType'+i+'" id="deleteSurveyType'+(i+1)+'" src="..\\..\\img\\delBtn.jpg" style="width:15px; height:15px; margin-right:5px;" onclick="delSurveyType('+i+','+data.title[i].survey_type_id+')"></div>'+
-				 					   '<div id="surveyDiv'+i+'">'+
+				 					   '<div id="surveyDiv'+i+'" style="border:0px solid #000;" class="survey_tb01">'+
+				 					   	'<div class="delSurTypeDiv"><img class="deleteSurveyType'+i+'" id="deleteSurveyType'+(i+1)+'" src="/images/common/builder/survey/survey_list_closebt.gif" style="margin-right:5px;" onclick="delSurveyType('+i+','+data.title[i].SURVEY_TYPE_ID+')"></div>'+
 					 					   	'<input type="hidden" id="surveyAnswerType'+(i+1)+'" name="surveyAnswerType" value="'+answerType+'">'+
-											'<span id="surveyTypeIdSpan'+(i+1)+'"><input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].survey_type_id+'"/></span>'+
-											'<div><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
-											'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].survey_type+'">'+
-				  							'<div><span class="titleSpan" id="titleSpan'+(i+1)+'">'+data.title[i].second_survey_title+'</span>'+
-			  						   '</div>';
+											'<span id="surveyTypeIdSpan'+(i+1)+'"><input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].SURVEY_TYPE_ID+'"/></span>'+
+											'<div class="surveyTypeDiv"><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
+											'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].SURVEY_TYPE+'">'+
+				  							'<div class="surveyTitleDiv">'+
+				  								'<span style="margin-left:20px;background:url(/images/common/builder/survey/circle_bullet.png) no-repeat; width:14px;height:14px;display: inline-block; overflow: hidden;vertical-align: middle;"></span>'+
+				  								'<span class="titleSpan" id="titleSpan'+(i+1)+'" >'+data.title[i].SECOND_SURVEY_TITLE+'</span>'+
+				  							'</div>'+
+				  							'<div></div><br/>';
 					var j=0;
 					//contents 값 for
 			  		for(j in data.reply[i]){
 			  			j = parseInt(j);
-						var img = data.reply[i][j]['survey_image_path']; 
+						var img = data.reply[i][j]['SURVEY_IMAGE_PATH']; 
 				  		selectSurvey +=	'<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(j+1)+'">'+
-				  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['survey_contents_id']+'">';
+				  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['SURVEY_CONTENTS_ID']+'">';
+				  		if(answerType=='1'){
+				  			selectSurvey +=	//'<div></div>'+
+							  				'<div class="contsTxtDiv">'+
+								  				'<span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px; display:inline-block; overflow: hidden;vertical-align: middle;"></span>'+
+								  				'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+							  				'</div>';
+				  		}
 				  		if(answerType=='2'){
 					  		selectSurvey +=	
-								  			'<div style="margin:0 0 0 190px;"><img class="deleteConts'+i+'" id="deleteConts'+(i+1)+'_'+(j+1)+'" src="..\\..\\img\\delBtn.jpg" style="width:12px; height:12px;" onclick="delConts('+i+','+j+', '+data.reply[i][j]['survey_contents_id']+')"></div> '+
-					  						'<img class="img" src="'+data.reply[i][j]['survey_image_path']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:150px;"/>';
+								  			'<div class="delSurContsDiv"><img class="deleteConts'+i+'" id="deleteConts'+(i+1)+'_'+(j+1)+'" src="/images/common/builder/survey/delBtn.png" style="width:15px; height:15px;" onclick="delConts('+i+','+j+', '+data.reply[i][j]['SURVEY_CONTENTS_ID']+')"></div> '+
+					  						'<img class="img" src="'+data.reply[i][j]['SURVEY_IMAGE_PATH']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:160px;"/>'+
+					  						'<div class="contsTxtDiv">'+
+					  							'<span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span>'+
+					  							'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+					  						'</div>';	
 				  		}//if			
-				  		selectSurvey +=		'<div></div><span id="contentsSpan'+(i+1)+'_'+(j+1)+'" style="font-size:0.8em;">'+data.reply[i][j]['survey_contents']+'</span>'+
 				  						'</div>'; 
 					}//for
 			  	
-			  		selectSurvey += '</div><br/>';
+			  		selectSurvey += '</div>';
 					 
 					//설문조사 조회 html append
 					$('#listDiv').append(selectSurvey);
@@ -144,10 +157,10 @@
 	//텍스트/이미지 val 체크 함수
 	function valChkFunc(){
 		//validation span 체크
-		if($('li[rel="tab1"]').attr('class')=='active'){
+		if($('li[rel="tab1"]').attr('class')=='active visitd'){
 			txtValChk();
 			return false;
-		}else if($('li[rel="tab2"]').attr('class')=='active'){
+		}else if($('li[rel="tab2"]').attr('class')=='active visitd'){
 			imgValChk();
 			return false;
 		}else if(btn5Click==true){
@@ -185,8 +198,11 @@
 		$('#insertDiv').remove();
 		
 		//유형선택 class 제거
-		$('#makeq section.choiceType ul li').removeClass('on');
-		$('#makeq section.choiceType ul li span').attr('class', 'offTx');
+		$('#makeq section.choiceType ul li a.crownOn').attr('class', 'crownOff');
+		$('#makeq section.choiceType ul li a.starOn').attr('class', 'starOff');
+		$('#makeq section.choiceType ul li a.choiceOn').attr('class', 'choiceOff');
+		$('#makeq section.choiceType ul li a.numberOn').attr('class', 'numberOff');
+		$('#makeq section.choiceType ul li a.textOn').attr('class', 'textOff');
 		
 		//답변추가 수 초기화
 		contsAddBtnClickCnt = 0;
@@ -277,8 +293,7 @@
 				//div 보이기
 				$('#listDiv').before('<div id="insertDiv"></div>');
 				//순위형 클릭시 유형 선택 class 주기
-				$('#btn1').parent().addClass('on');
-				$('#btn1').children('span').attr('class','onTx');
+				$('#btn1').attr('class','crownOn');
 				
 				//순위형 클릭시 질문1txt와 답변1txt append하기
 				btnTxt();
@@ -337,8 +352,7 @@
 				//div 보이기
 				$('#listDiv').before('<div id="insertDiv"></div>');
 				//별점형 클릭시 유형 선택 class 주기
-				$('#btn2').parent().addClass('on');
-				$('#btn2').children('span').attr('class','onTx');
+				$('#btn2').attr('class','starOn');
 				
 				//벌점형 클릭시 질문2txt와 답변2-1, 답변2-2txt append하기
 				btnTxt();
@@ -403,8 +417,7 @@
 				//div 보이기
 				$('#listDiv').before('<div id="insertDiv"></div>');
 				//택일형 클릭시 유형 선택 class 주기
-				$('#btn3').parent().addClass('on');
-				$('#btn3').children('span').attr('class','onTx');
+				$('#btn3').attr('class','choiceOn');
 				
 				//질문, 답변 append하기
 				btn3Txt();		
@@ -469,8 +482,7 @@
 				//div 보이기
 				$('#listDiv').before('<div id="insertDiv"></div>');
 				//선택형 클릭시 유형 선택 class 주기
-				$('#btn4').parent().addClass('on');
-				$('#btn4').children('span').attr('class','onTx');
+				$('#btn4').attr('class','numberOn');
 				
 				//질문, 답변 append하기
 				btnTxt();		
@@ -535,8 +547,7 @@
 				//div 보이기
 				$('#listDiv').before('<div id="insertDiv"></div>');
 				//텍스트형 클릭시 유형 선택 class 주기
-				$('#btn5').parent().addClass('on');
-				$('#btn5').children('span').attr('class','onTx');
+				$('#btn5').attr('class','textOn');
 				
 				//질문, 답변 append하기
 				btnTxt();		
@@ -604,18 +615,18 @@
 				if($('#insertDiv').val()!=undefined){
 					//순위형/선택형/텍스트형 클릭일 때
 					if(btn1Click==true || btn4Click==true || btn5Click==true){
-						$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(j+1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(j+1)+')"></div><div></div>');
+						$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(j+1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(j+1)+')"></span><div></div>');
 					}else if(btn2Click == true){	//별점형 클릭일 때 
-						$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(j+1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(j+1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+addBtnCnt+'" onclick="gradeBtn()" ></div><div></div>');
+						$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(j+1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(j+1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+addBtnCnt+'" onclick="gradeBtn()" ></span><div></div>');
 					}else if(btn3Click == true){	//택일형 클릭일 때
 						//alert('택일형');
 					}//if
 				}else {//기존 survey 수정
 					//surveyType이 1(순위형)/4(선택형)/5(텍스트형)일 때
 					if(surveyTypeVal=='1' || surveyTypeVal=='4' || surveyTypeVal=='5'){
-						$('#surveyDiv'+i+' #txtContsDiv'+(addBtnCnt-1)+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+(addBtnCnt)+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+(addBtnCnt)+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></div><div></div>');
+						$('#surveyDiv'+i+' #txtContsDiv'+(addBtnCnt-1)+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+(addBtnCnt)+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+(addBtnCnt)+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></span><div></div>');
 					}else if(surveyTypeVal == '2'){	//surveyType이 2(별점형)일 때
-						$('#surveyDiv'+i+' #txtContsDiv'+(addBtnCnt-1)+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+(addBtnCnt)+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+(addBtnCnt)+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></div><div></div>');
+						$('#surveyDiv'+i+' #txtContsDiv'+(addBtnCnt-1)+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+(addBtnCnt)+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+(addBtnCnt)+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></span><div></div>');
 					}else if(surveyTypeVal == '3'){	//surveyType이 3(택일형)일 때
 						alert('택일형');
 					}//if
@@ -628,18 +639,18 @@
 					if($('#insertDiv').val()!=undefined){
 						//순위형/선택형/텍스트형 클릭일 때
 						if(btn1Click==true || btn4Click==true || btn5Click==true){
-							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></div><div></div>');
+							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></span><div></div>');
 						}else if(btn2Click == true){	//별점형 클릭일 때
-							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></div><div></div>');
+							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></span><div></div>');
 						}else if(btn3Click == true){	//택일형 클릭일 때
 							alert('택일형');
 						}//if
 					}else {//기존 survey 수정
 						//surveyType이 1(순위형)/4(선택형)/5(텍스트형)일 때
 						if(surveyTypeVal == '1' || surveyTypeVal == '4' || surveyTypeVal == '5'){
-							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></div><div></div>');
+							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></span><div></div>');
 						}else if(surveyTypeVal == '2'){ //surveyType이 2(별점형)일 때
-							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></div><div></div>');
+							$('#contsValChkSpan'+(addBtnCnt-1)+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></span><div></div>');
 						}else if(surveyTypeVal == '3'){ //surveyType이 3(택일형)일 때
 							alert('택일형');
 						}//if
@@ -650,19 +661,19 @@
 						//순위형/선택형/텍스트형 클릭일 때
 						if(btn1Click==true || btn4Click == true || btn5Click == true){
 							//removeBtn 다음에 after
-							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></div><div></div>');
+							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></span><div></div>');
 						}else if(btn2Click == true){	//별점형 클릭일 때
 							//별점 버튼 다음에 after
-							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></div><div></div>');
+							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></span><div></div>');
 						}else if(btn3Click == true){	//택일형 클릭일 때
 							alert('택일형');
 						}//if
 					}else {
 						//surveyType이 1(순위형)/4(선택형)/5(텍스트형)일 때
 						if(surveyTypeVal=='1' || surveyTypeVal=='4' || surveyTypeVal=='5'){
-							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></div><div></div>');
+							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"></span><div></div>');
 						}else if(surveyTypeVal == '2'){ //surveyType이 2(별점형)일 때
-							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><div id="txtContsDiv'+addBtnCnt+'"><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></div><div></div>');
+							$('#txtContsDiv'+$('.addBtn'+i+'').size()+'').after('<div></div><span id="txtContsDiv'+addBtnCnt+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+addBtnCnt+'" name="surveyContents" placeholder="내용을 입력해주세요."><input type="button" class="addBtn'+i+'" id="addBtn'+addBtnCnt+'" onclick="addBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+addBtnCnt+'" onclick="removeBtn('+i+','+(addBtnCnt-1)+')"><input type="button" class="gradeBtn'+i+'" id="gradeBtn'+(addBtnCnt)+'" onclick="gradeBtn()"></span><div></div>');
 						}else if(surveyTypeVal == '3'){ //surveyType이 3(택일형)일 때
 							alert('택일형');
 						}//if
@@ -723,7 +734,7 @@
 				var surveyTypeVal = $('#surveyDiv'+i+' input[name="surveyType"]').val();
 				
 				//surveyType이 1(순위형)/4(선택형)/5(텍스트형)일 때 
-				$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').wrap('<div id="txtContsDiv'+(contsIdx+1)+'"><input type="text" id="surveyContents'+(i+1)+'_'+(contsIdx+1)+'" name="surveyContents" value="'+$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').text()+'" placeholder="내용을 입력해주세요.">');
+				$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').wrap('<span id="txtContsDiv'+(contsIdx+1)+'"><input type="text" id="surveyContents'+(i+1)+'_'+(contsIdx+1)+'" name="surveyContents" value="'+$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').text()+'" placeholder="내용을 입력해주세요."></span>');
 				if(surveyTypeVal=='1' || surveyTypeVal=='4' || surveyTypeVal=='5'){
 					$('#surveyContents'+(i+1)+'_'+(contsIdx+1)+'').after('<input type="button" class="addBtn'+i+'" id="addBtn'+(contsIdx+1)+'" onclick="addBtn('+i+','+contsIdx+')"><input type="button" class="removeBtn'+i+'" id="removeBtn'+(contsIdx+1)+'" onclick="removeBtn('+i+','+contsIdx+')"></div><div></div>');
 				}else if(surveyTypeVal=='2'){//surveyType이 2(별점형)일 때
@@ -736,13 +747,12 @@
 			}//for
 		}else if($('#surveyAnswerType'+(i+1)+'').val()=='2'){
 			$('#titleSpan'+(i+1)+'').wrap('<input type="text" id="secondSurveyTitle'+(i+1)+'" name="secondSurveyTitle" value="'+$('#titleSpan'+(i+1)+'').text()+'" placeholder="질문을 입력해주세요.">');
-			$('#secondSurveyTitle'+(i+1)+'').after('<input type="button" class="addConts'+i+' btn btn-default btn-sm" id="addConts1" value="답변추가" onclick="contsAddBtn('+i+','+j+')">');
+			$('#secondSurveyTitle'+(i+1)+'').after('<input type="button" class="addConts'+i+'" id="addConts1" onclick="contsAddBtn('+i+','+j+')">');
 			for(var contsIdx=0; contsIdx<=j; contsIdx++){
 				var contsId = $('#surveyDiv'+i+' #surveyContentsId'+(contsIdx+1)+'').val();
-				//$('#img'+(i+1)+'_'+(contsIdx+1)+'').before('<div style="margin-left:190px;"><img class="deleteConts'+i+'" id="deleteConts'+(i+1)+'_'+(contsIdx+1)+'" src="..\\..\\img\\delBtn.jpg" style="width:15px; height:15px; margin-right:5px;" onclick="delConts('+i+','+contsIdx+','+contsId+')"></div><input type="file" id="surveyImagePath'+(i+1)+'_'+(contsIdx+1)+'" name="surveyImagePath">');
 				$('#img'+(i+1)+'_'+(contsIdx+1)+'').before('<input type="file" id="surveyImagePath'+(i+1)+'_'+(contsIdx+1)+'" name="surveyImagePath">');
 				//title span -> text box로 변경
-				$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').wrap('<div id="txtContsDiv'+(contsIdx+1)+'"><input type="text" id="surveyContents'+(i+1)+'_'+(contsIdx+1)+'" name="surveyContents" value="'+$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').text()+'" placeholder="내용을 입력해주세요.">');
+				$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').wrap('<span id="txtContsDiv'+(contsIdx+1)+'"><input type="text" id="surveyContents'+(i+1)+'_'+(contsIdx+1)+'" name="surveyContents" value="'+$('#contentsSpan'+(i+1)+'_'+(contsIdx+1)+'').text()+'" placeholder="내용을 입력해주세요."></span>');
 			}//for
 			
 			//기존 이미지 수정시 읽어오기 
@@ -750,7 +760,7 @@
 		}//if
 		
 		//임시 저장 버튼 
-		$('#surveyDiv'+i+'').append('<div style="text-align:right;"><input type="button" class="btn btn-default btn-sm" id="tempStore'+i+'" value="임시저장" onclick="tempStore('+i+', '+j+')"/></div>');
+		$('#surveyDiv'+i+'').append('<div style="text-align:right;"><input type="button" class="tempStore" id="tempStore'+i+'" onclick="tempStore('+i+', '+j+')"/></div>');
 		
 		//surveyType 값 선언
 		var surveyTypeVal = $('#surveyDiv'+i+' input[name="surveyType"]').val();
@@ -823,7 +833,7 @@
 	    $("ul.tabs li").click(function (e) {
 	        $("ul.tabs li").removeClass("active").css("color", "#333");
 	        //$(this).addClass("active").css({"color": "darkred","font-weight": "bolder"});
-	        $(this).addClass("active").css("color", "darkred");
+	        $(this).addClass("active").css("color", "#fafafa");
 	        $(".tab_content").hide();
 	        var activeTab = $(this).attr("rel");
 	        $("#" + activeTab).fadeIn()
@@ -904,7 +914,7 @@
 										//현재값과 surveyImagePath의 값이 같으면
 										if('surveyImagePath'+i+'' == imgPathId){
 											img.css('display','inline-block');
-											img.append(img.attr('src', e.target.result));
+											img.attr('src', e.target.result);
 										}//if
 									}
 								reader.readAsDataURL(this.files[j]);
@@ -1010,7 +1020,7 @@
 									var img = $('#img'+(k+1)+'_'+i+'');
 									
 									img.css('display','inline-block');
-									img.append(img.attr('src', e.target.result));
+									img.attr('src', e.target.result);
 								}//if
 								
 								//수정 일 때 기존 이미지 수정시
@@ -1044,10 +1054,10 @@
 				//답변추가 클릭하면 컨텐츠 append
 				//j = parseInt(j);
 				contsHtml +=  '<div class="contsDiv" id="contsDiv'+no+'" >'+
-								'<div style="margin-left:190px;"><img class="deleteConts'+i+'" id="deleteConts'+(i+1)+'_'+no+'" src="..\\..\\img\\delBtn.jpg" style="width:15px; height:15px;" onclick="delConts('+i+','+no+', null)"></div> '+
+								'<div class="delSurContsDiv"><img class="deleteConts'+i+'" id="deleteConts'+(i+1)+'_'+no+'" src="/images/common/builder/survey/delBtn.png" style="width:15px; height:15px;" onclick="delConts('+i+','+no+', null)"></div> '+
 								'<input type="file" id="surveyImagePath'+no+'" name="surveyImagePath">'+
-								'<img class="img" id="img'+no+'" alt="img'+no+'" src="#"> '+
-								'<div></div><div id="txtContsDiv'+no+'"><input type="text" id="surveyContents'+no+'" name="surveyContents" placeholder="내용을 입력해주세요."></div>'+
+								'<img class="img" id="img'+no+'" alt="" src=""> '+
+								'<div></div><span id="txtContsDiv'+no+'"><input type="text" id="surveyContents'+no+'" name="surveyContents" placeholder="내용을 입력해주세요."></span>'+
 		   					  '</div>';
 		   					  
 				$('#tab2 #txtDiv2').append(contsHtml);
@@ -1061,10 +1071,9 @@
 			if(imgCnt<8){
 				
 			contsHtml +=  '<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(imgCnt+1)+'">'+
-							//'<div style="margin-left:190px;"><img class="deleteConts'+i+'" id="deleteConts'+(i+1)+'_'+(imgCnt+1)+'" src="..\\..\\img\\delBtn.jpg" style="width:15px; height:15px; margin-right:5px;" onclick="delConts('+i+','+imgCnt+', null)"></div> '+
 							'<input type="file" id="surveyImagePath'+(i+1)+'_'+(imgCnt+1)+'" name="surveyImagePath">'+
-							'<img class="img" id="img'+(i+1)+'_'+(imgCnt+1)+'" alt="img'+(i+1)+'_'+(imgCnt+1)+'" src="#"> '+
-							'<div></div><div id="txtContsDiv'+(imgCnt+1)+'"><input type="text" id="surveyContents'+(i+1)+'_'+(imgCnt+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></div>'+
+							'<img class="img" id="img'+(i+1)+'_'+(imgCnt+1)+'" alt="" src=""> '+
+							'<div></div><span id="txtContsDiv'+(imgCnt+1)+'"><span style="margin-left:25px;background:url(/images/common/builder/survey/reply_bullet.png) no-repeat; width:4px;height:4px;display: inline-block; overflow: hidden;vertical-align: middle;"></span><input type="text" id="surveyContents'+(i+1)+'_'+(imgCnt+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></span>'+
 			 			  '</div>';
 			  
 			$('#contsDiv'+(i+1)+'_'+(imgCnt)+'').after(contsHtml);		
@@ -1088,7 +1097,6 @@
 			});
 		});
 		
-		
 		if(delContsCnt > 2){
 			if($('#insertDiv').val()!=undefined){
 				var contsId='';
@@ -1104,7 +1112,7 @@
 					//해당 설문조사의 contsDiv 삭제
 					$('#surveyDiv'+i+' #contsDiv'+(i+1)+'_'+(j+1)+'').remove();
 					$.ajax({
-						url : '/deleteConts/'+contsId,
+						url : '/upload/deleteConts?contsId='+contsId,
 						data : fd,
 						type : 'POST',
 						processData : false,
@@ -1136,10 +1144,12 @@
 		
 		//return false;
 		if(confirm('삭제하시겠습니까?') == true){
-			//해당 설문조사의 contsDiv 삭제
+			//중질문삭제 버튼 제거 
+			$('#deleteSurveyType'+(i+1)+'').remove();
+			//해당 설문조사의 contsDiv 제거
 			$('#surveyDiv'+i+'').remove();
 			$.ajax({
-				url : '/deleteSurveyType/'+surveyTypeId,
+				url : '/upload/deleteSurveyType?surveyTypeId='+surveyTypeId+'',
 				data : fd,
 				type : 'POST',
 				processData : false,
@@ -1149,7 +1159,9 @@
 				}//end success
 			});//end ajax
 			alert('설문조사가 삭제되었습니다.');
+			reloadPopFunc();
 		}else {
+			reloadPopFunc();
 			return false;
 		}//if
 	}
@@ -1165,7 +1177,7 @@
 			var txtHtml = '';
 			txtHtml += '<div id="txtDiv1">'+
 							'<input type="text" id="secondSurveyTitle1" name="secondSurveyTitle" placeholder="질문을 입력해주세요."><div></div>'+                                                                                                                                                                                                                               
-							'<div id="txtContsDiv1">'+
+							'<span id="txtContsDiv1">'+
 								'<input type="text" id="surveyContents1" name="surveyContents" placeholder="내용을 입력해주세요.">'+
 								'<input type="button" class="addBtn'+i+'" id="addBtn1" onclick="addBtn('+i+','+j+')">'+
 								'<input type="button" class="removeBtn'+i+'" id="removeBtn1" onclick="removeBtn('+i+','+j+')">'+
@@ -1175,8 +1187,8 @@
 				txtHtml += 		'<input type="button" class="gradeBtn'+i+'" id="gradeBtn1" onclick="gradeBtn()">';
 			}//if					
 			txtHtml +=			'<div></div>'+
-							'</div>'+       
-							'<div id="txtContsDiv2">'+
+							'</span>'+       
+							'<span id="txtContsDiv2">'+
 								'<input type="text" id="surveyContents2" name="surveyContents" placeholder="내용을 입력해주세요.">'+
 								'<input type="button" class="addBtn'+i+'" id="addBtn2" onclick="addBtn('+i+','+j+')">'+
 								'<input type="button" class="removeBtn'+i+'" id="removeBtn2" onclick="removeBtn('+i+','+j+')">';
@@ -1185,13 +1197,13 @@
 				txtHtml += 		'<input type="button" class="gradeBtn'+i+'" id="gradeBtn2" onclick="gradeBtn()">';
 			}//if					
 			txtHtml	+=			'<div></div>'+
-							'</div>'+
+							'</span>'+
 						'</div>';
 			
 			var fileHtml = '';
 			fileHtml += '<div id="txtDiv2">'+
 							'<input type="text" id="secondSurveyTitle2" name="secondSurveyTitle" placeholder="질문을 입력해주세요.">'+
-							'<input type="button" class="addConts'+i+' btn btn-default btn-sm" id="addConts1" value="답변추가" onclick="contsAddBtn('+i+','+j+')">'+
+							'<input type="button" class="addConts'+i+'" id="addConts1" onclick="contsAddBtn('+i+','+j+')">'+
 					   	'</div>';
 			
 			//순위형/별점형/선택형일 경우
@@ -1199,10 +1211,10 @@
 							'<h1> 질문입력 </h1> <span class="addtion">최대 8개까지 입력이 가능합니다.</span> '+
 							'<div id="container">'+
 								'<ul class="tabs">'+
-									'<li class="active" rel="tab1">텍스트</li>'+
+									'<li class="active visitd" rel="tab1">텍스트</li>'+
 									'<li rel="tab2">이미지</li>'+
 								'</ul>'+
-								'<div class="tab_container">'+
+								'<div class="tab_container boxline">'+
 									'<div id="tab1" class="tab_content">'+
 										txtHtml+
 										'<br/><br/>'+
@@ -1300,15 +1312,15 @@
 			//텍스트/이미지 탭				  
 			$('#insertDiv').append('<div id="container">'+
 									'<ul class="tabs">'+
-										'<li class="active" rel="tab1">텍스트</li>'+
+										'<li class="active visitd" rel="tab1">텍스트</li>'+
 										'<li rel="tab2">이미지</li>'+
 									'</ul>'+
 									'<div class="tab_container">'+
-										'<div id="tab1" class="tab_content">'+
+										'<div id="tab1" class="tab_content boxline">'+
 											choiceHtml+
 											//'<br/><br/><input type="button" id="survey1" value="저장" /><input type="button" id="cancel1" value="취소" />'+
 										'</div>'+	
-										'<div id="tab2" class="tab_content">'+
+										'<div id="tab2" class="tab_content boxline">'+
 											choiceHtml+
 											//fileHtml+
 											'<br/><br/>'+
@@ -1342,25 +1354,25 @@
 				if($('#tab1 input:radio[name="choice"]:checked').val() == '2'){
 					//contents 내용
 					for(var i=0; i<2; i++){
-						contsHtml += '<div id="txtContsDiv'+(i+1)+'">'+
+						contsHtml += '<span id="txtContsDiv'+(i+1)+'">'+
 										'<input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요.">'+
-									 '</div>'+
+									 '</span>'+
 									 '<div></div>';
 					}//for
 				}else if($('#tab1 input:radio[name="choice"]:checked').val()=='4'){//4개 택일형
 					//contents 내용
 					for(var i=0; i<4; i++){
-						contsHtml += '<div id="txtContsDiv'+(i+1)+'">'+
+						contsHtml += '<span id="txtContsDiv'+(i+1)+'">'+
 										'<input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요.">'+
-									 '</div>'+
+									 '</span>'+
 									 '<div></div>';
 					}//for
 				}else if($('#tab1 input:radio[name="choice"]:checked').val()=='8'){//8개 택일형
 					//contents 내용
 					for(var i=0; i<8; i++){
-						contsHtml += '<div id="txtContsDiv'+(i+1)+'">'+
+						contsHtml += '<span id="txtContsDiv'+(i+1)+'">'+
 										'<input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요.">'+
-									 '</div>'+
+									 '</span>'+
 									 '<div></div>';
 					}//for
 				}//if
@@ -1380,8 +1392,8 @@
 						// 이미지 파일 
 						fileHtml += '<input type="file" id="surveyImagePath'+(i+1)+'" name="surveyImagePath" >'+
 									'<div class="contsDiv" id="contsDiv'+(i+1)+'">'+
-							   			'<img class="img" id="img'+(i+1)+'" alt="img'+(i+1)+'" src="#"> '+
-										'<div></div><div id="txtContsDiv'+(i+1)+'"><input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></div>'+	
+							   			'<img class="img" id="img'+(i+1)+'" alt="" src="" style="background:url(/images/common/builder/survey/img_add.png); no-repeat;"> '+
+										'<div></div><span id="txtContsDiv'+(i+1)+'"><input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></span>'+	
 							   		'</div>'; 
 					}//for
 				}else if($('#tab2 input:radio[name="choice"]:checked').val()=='4'){//4개 택일형
@@ -1390,8 +1402,8 @@
 						// 이미지 파일 
 						fileHtml += '<input type="file" id="surveyImagePath'+(i+1)+'" name="surveyImagePath" >'+
 									'<div class="contsDiv" id="contsDiv'+(i+1)+'">'+
-							   			'<img class="img" id="img'+(i+1)+'" alt="img'+(i+1)+'" src="#"> '+
-							   			'<div></div><div id="txtContsDiv'+(i+1)+'"><input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></div>'+
+							   			'<img class="img" id="img'+(i+1)+'" alt="" src=""> '+
+							   			'<div></div><span id="txtContsDiv'+(i+1)+'"><input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></span>'+
 							   		'</div>'; 
 					}//for
 				}else if($('#tab2 input:radio[name="choice"]:checked').val()=='8'){//8개 택일형
@@ -1400,8 +1412,8 @@
 						// 이미지 파일 
 						fileHtml += '<input type="file" id="surveyImagePath'+(i+1)+'" name="surveyImagePath" >'+
 									'<div class="contsDiv" id="contsDiv'+(i+1)+'">'+
-							   			'<img class="img" id="img'+(i+1)+'" alt="img'+(i+1)+'" src="#"> '+
-							   			'<div></div><div id="txtContsDiv'+(i+1)+'"><input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></div>'+
+							   			'<img class="img" id="img'+(i+1)+'" alt="" src=""> '+
+							   			'<div></div><span id="txtContsDiv'+(i+1)+'"><input type="text" id="surveyContents'+(i+1)+'" name="surveyContents" placeholder="내용을 입력해주세요."></span>'+
 							   		'</div>'; 
 					}//for
 				}//if
@@ -1451,7 +1463,7 @@
 			if($(tabChk+'input[name="secondSurveyTitle"]').val()==''){
 				//secondSurveyTitle validation span이 없으면 추가
 				if($(tabChk+'#titleValChkSpan').val()==undefined){
-					$(tabChk+'input[name="secondSurveyTitle"]').after('<div></div><span id="titleValChkSpan"> 질문을 입력해주세요.</span>');
+					$(tabChk+'input[name="secondSurveyTitle"]').after('<div></div><span id="titleValChkSpan"> *질문을 입력해주세요.</span>');
 				}//if
 			}else {
 				//질문txt 값이 있으면 validation span 제거
@@ -1461,7 +1473,7 @@
 			if($('input[name="secondSurveyTitle"]').val()==''){
 				//secondSurveyTitle validation span이 없으면 추가
 				if($('#titleValChkSpan').val()==undefined){
-					$('input[name="secondSurveyTitle"]').after('<div></div><span id="titleValChkSpan"> 질문을 입력해주세요.</span>');
+					$('input[name="secondSurveyTitle"]').after('<div></div><span id="titleValChkSpan"> *질문을 입력해주세요.</span>');
 				}//if
 			} else {
 				//질문txt 값이 있으면 validation span 제거
@@ -1477,7 +1489,7 @@
 				if($(tabChk+'#surveyContents'+(j+1)+'').val()==''){
 					//내용 validation span이 없으면 추가
 					if($(tabChk+'#contsValChkSpan'+(j+1)+'').val()==undefined){
-						$(tabChk+'#txtContsDiv'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> 내용을 입력해주세요.</span>');
+						$(tabChk+'#txtContsDiv'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> *내용을 입력해주세요.</span><div></div>');
 					}//if
 				} else {
 					//내용txt 값이 있으면 validation span 제거
@@ -1500,7 +1512,7 @@
 				 	if(typeof contsVal=='string' && (!contsVal || contsVal=='')){
 						//내용 validation span이 없으면 추가
 						if($('#surveyDiv'+(i)+' #contsValChkSpan'+(j+1)+'').val()==undefined){
-							$('#surveyDiv'+(i)+' #removeBtn'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> 내용을 입력해주세요.</span>');
+							$('#surveyDiv'+(i)+' #removeBtn'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> *내용을 입력해주세요.</span><div></div>');
 						}//if
 					}else if((typeof contsVal=='string' && (contsVal && contsVal!=''))) { //text box이면서 값이 null이 아닐 때
 						//내용txt 값이 있으면 validation span 제거
@@ -1517,7 +1529,7 @@
 				if($(tabChk+'#surveyContents'+(i+1)+'').val()==''){
 					//내용 validation span이 없으면 추가
 					if($(tabChk+'#contsValChkSpan'+(i+1)+'').val()==undefined){
-						$(tabChk+'#txtContsDiv'+(i+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(i+1)+'"> 내용을 입력해주세요.</span>');
+						$(tabChk+'#txtContsDiv'+(i+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(i+1)+'"> *내용을 입력해주세요.</span><div></div>');
 					}//if
 				} else {
 					//내용txt 값이 있으면 validation span 제거
@@ -1535,9 +1547,9 @@
 				//secondSurveyTitle validation span이 없으면 추가
 				if($('#tab2 #titleValChkSpan').val()==undefined){
 					if(btn1Click==true || btn2Click==true || btn4Click==true){
-						$('#tab2 #addConts1').after('<div></div><span id="titleValChkSpan"> 질문을 입력해주세요.</span>');
+						$('#tab2 #addConts1').after('<div></div><span id="titleValChkSpan"> *질문을 입력해주세요.</span>');
 					}else if(btn3Click==true){
-						$('#tab2 #secondSurveyTitle2').after('<div></div><span id="titleValChkSpan"> 질문을 입력해주세요.</span>');
+						$('#tab2 #secondSurveyTitle2').after('<div></div><span id="titleValChkSpan"> *질문을 입력해주세요.</span>');
 					}//if
 				}//if
 			}else {
@@ -1549,7 +1561,8 @@
 			if($('input[name="secondSurveyTitle"]').val()==''){
 				//secondSurveyTitle validation span이 없으면 추가
 				if($('#titleValChkSpan').val()==undefined){
-					$('input[name="secondSurveyTitle"]').next().after('<div></div><span id="titleValChkSpan"> 질문을 입력해주세요.</span>');
+					console.log($('input[name="secondSurveyTitle"]').next());
+					$('input[name="secondSurveyTitle"]').next().after('<div></div><span id="titleValChkSpan"> *질문을 입력해주세요.</span>');
 					//$('input[name="secondSurveyTitle"]').after('<div></div><span id="titleValChkSpan"> 질문을 입력해주세요.</span>');
 				}//if
 			}else {
@@ -1565,7 +1578,7 @@
 					//내용 validation span이 없으면 추가
 					
 					if($('#tab2 #contsValChkSpan'+(j+1)+'').val()==undefined){
-						$('#tab2 #txtContsDiv'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> 내용을 입력해주세요.</span>');
+						$('#tab2 #txtContsDiv'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> *내용을 입력해주세요.</span>');
 					}//if
 				} else {
 					//내용txt 값이 있으면 validation span 제거
@@ -1578,10 +1591,10 @@
 			console.log('imgCnt::'+imgCnt);
 			for(var j=0; j<8; j++){
 				console.log('j:::'+j);
-				if( $('#tab2 #img'+(j+1)+'').attr('src')=='#' ){
+				if( $('#tab2 #img'+(j+1)+'').attr('src')=='' ){
 					//img chk span이 없으면 추가
 					if($('#tab2 #imgChkSpan'+(j+1)+'').val()==undefined){
-						$('#tab2 #img'+(j+1)+'').after('<div></div><span class="imgChkSpan" id="imgChkSpan'+(j+1)+'"> 이미지를 추가해주세요.</span>');
+						$('#tab2 #img'+(j+1)+'').after('<div></div><span class="imgChkSpan" id="imgChkSpan'+(j+1)+'"> *이미지를 추가해주세요.</span>');
 					}//if
 				}else {
 					//img가 있으면 img chk span 제거
@@ -1609,7 +1622,7 @@
 					if($('#surveyDiv'+i+' #surveyContents'+(i+1)+'_'+(j+1)+'').val()==''){
 						//내용 validation span이 없으면 추가
 						if($('#surveyDiv'+i+' #contsValChkSpan'+(j+1)+'').val()==undefined){
-							$('#surveyDiv'+i+' #txtContsDiv'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> 내용을 입력해주세요.</span>');
+							$('#surveyDiv'+i+' #txtContsDiv'+(j+1)+'').after('<div></div><span class="contsValChkSpan" id="contsValChkSpan'+(j+1)+'"> *내용을 입력해주세요.</span>');
 							return false;
 						}//if
 					} else {
@@ -1618,10 +1631,10 @@
 					}//if
 					
 					//img가 없을 때 val chk
-					if( $('#surveyDiv'+i+' #img'+(i+1)+'_'+(j+1)+'').attr('src')=='#' ){
+					if( $('#surveyDiv'+i+' #img'+(i+1)+'_'+(j+1)+'').attr('src')=='' ){
 						//img chk span이 없으면 추가
 						if($('#surveyDiv'+i+' #imgChkSpan'+(i+1)+'_'+(j+1)+'').val()==undefined){
-							$('#surveyDiv'+i+' #img'+(i+1)+'_'+(j+1)+'').after('<div></div><span class="imgChkSpan" id="imgChkSpan'+(i+1)+'_'+(j+1)+'"> 이미지를 추가해주세요.</span>');
+							$('#surveyDiv'+i+' #img'+(i+1)+'_'+(j+1)+'').after('<div></div><span class="imgChkSpan" id="imgChkSpan'+(i+1)+'_'+(j+1)+'"> *이미지를 추가해주세요.</span>');
 						}//if
 					}else {
 						//img가 있으면 img chk span 제거
@@ -1680,7 +1693,7 @@
 		
 		//텍스트탭 insert
 		//질문txt와 내용1txt 내용2txt 모두 값이 있으면 db에 저장
-		if($('li[rel="tab1"]').attr('class')=='active' || btn5Click==true){
+		if($('li[rel="tab1"]').attr('class')=='active visitd' || btn5Click==true){
 		//if( $(tabChk+'#secondSurveyTitle1').val()!='' && $(tabChk+'#surveyContents1').val()!='' && $(tabChk+'#surveyContents2').val()!='' ){
 			console.log('tabChk::'+tabChk);
 			
@@ -1725,26 +1738,25 @@
 			console.log(fd);
 		
 			$.ajax({
-				url : '/insertSurveySecondTitle',
+				url : '/upload/insertSurveySecondTitle',
 				data : fd,
 				type : 'POST',
 				//dataType: 'json',
 				processData : false,
 				contentType : false,
-				success : function(data){
-					alert('설문지가 저장되었습니다.');
-					
-					//팝업 초기화 
-					reloadPopFunc();
-					
+				success : function(){
 				}//end success
 			});//end ajax
-		}else if($('li[rel="tab2"]').attr('class')=='active'){
+			alert('설문지가 저장되었습니다.');
+			//팝업 초기화 
+			reloadPopFunc();
+			
+		}else if($('li[rel="tab2"]').attr('class')=='active visitd'){
 			
 			console.log('이미지 저장');
 			
 			//이미지탭일 경우
-			if($('li[rel="tab2"]').attr('class')=='active'){
+			if($('li[rel="tab2"]').attr('class')=='active visitd'){
 				var contsDivCnt = $('#tab2 div[id*="contsDiv"]').size();
 				console.log('contsDivCnt:::'+contsDivCnt);
 				if(contsDivCnt<2){
@@ -1806,20 +1818,19 @@
 			fd.append('data', data);
 			
 			$.ajax({
-				url : '/insertSurveySecondTitle',
+				url : '/upload/insertSurveySecondTitle',
 				data : fd,
 				type : 'POST',
 				//dataType: 'json',
 				processData : false,
 				contentType : false,
-				success : function(data){
-					alert('설문지가 저장되었습니다.');
-					
-					//팝업 초기화 
-					reloadPopFunc();
-					
+				success : function(){
 				}//end success
 			});//end ajax
+			
+			alert('설문지가 저장되었습니다.');
+			//팝업 초기화 
+			reloadPopFunc();
 			
 		}//if
 	}
@@ -1833,37 +1844,39 @@
 		var conts = new Array();
 		
 		var value = imgArr.getValue();
-		
-		for(var no in value){
-			no = parseInt(no);
-			var contsNo = value[no].split('_')[1];
-			console.log('value[no]::'+value[no]);
-			console.log('contsNo::'+contsNo);
-			//file length 선언
-			var fileLeng = $('#surveyDiv'+i+' input[type="file"]').size();
-			console.log('fileLeng::'+fileLeng);
-			
-			//contsId 값
-			var contsId = $('#'+value[no]).children('input[name="surveyContentsId"]').val();
-			console.log('해당 no에 대한 contsId:'+contsId);
-			//img path id 값
-			var imgPathId = $('#'+value[no]).children('input[name="surveyImagePath"]').attr('id');
-			console.log('해당 no에 대한 imgPathId:'+imgPathId);
-			//var file = ($('#'+value[no]).children('input[name="surveyImagePath"]'))[no].files[0];
-			var file = $('#surveyDiv'+i+' input[type="file"]')[(contsNo-1)].files[0];
-			//var file = $('#surveyDiv'+i+' input[type="file"]')[(fileLeng-1)].files[0];
-			//console.log(file);
-			//컨텐츠 내용 div id 값 선언
-			var txtContsDiv = $('#'+value[no]).children('#txtContsDiv'+(contsNo)+'').attr('id');
-			//컨텐츠 내용 값 
-			var txtContsVal = $('#'+txtContsDiv+'').children('input[name="surveyContents"]').val();
-			console.log('해당 no에 대한 txtContsVal:'+txtContsVal);
-			
-			//컨텐츠들을 담음
-			conts.push({'contsId':contsId, 'imgPathId':imgPathId, 'txtContsVal':txtContsVal});
-			fd.append('file', file);
-			console.log(file);
-		}//for
+		if($('#surveyAnswerType'+(i+1)+'').val()=='2'){	//이미지일 경우에만 이쪽을 돔
+			for(var no in value){
+				no = parseInt(no);
+				var contsNo = value[no].split('_')[1];
+				console.log('value[no]::'+value[no]);
+				console.log('contsNo::'+contsNo);
+				//file length 선언
+				var fileLeng = $('#surveyDiv'+i+' input[type="file"]').size();
+				console.log('fileLeng::'+fileLeng);
+				
+				//contsId 값
+				var contsId = $('#'+value[no]).children('input[name="surveyContentsId"]').val();
+				console.log('해당 no에 대한 contsId:'+contsId);
+				//img path id 값
+				var imgPathId = $('#'+value[no]).children('input[name="surveyImagePath"]').attr('id');
+				console.log('해당 no에 대한 imgPathId:'+imgPathId);
+				//var file = ($('#'+value[no]).children('input[name="surveyImagePath"]'))[no].files[0];
+				var file = $('#surveyDiv'+i+' input[type="file"]')[(contsNo-1)].files[0];
+				fd.append('file', file);
+				
+				//var file = $('#surveyDiv'+i+' input[type="file"]')[(fileLeng-1)].files[0];
+				//console.log(file);
+				//컨텐츠 내용 div id 값 선언
+				var txtContsDiv = $('#'+value[no]).children('#txtContsDiv'+(contsNo)+'').attr('id');
+				//컨텐츠 내용 값 
+				var txtContsVal = $('#'+txtContsDiv+'').children('input[name="surveyContents"]').val();
+				console.log('해당 no에 대한 txtContsVal:'+txtContsVal);
+				
+				//컨텐츠들을 담음
+				conts.push({'contsId':contsId, 'imgPathId':imgPathId, 'txtContsVal':txtContsVal});
+				console.log(file);
+			}//for
+		}//if
 			
 		//컨텐츠를 json string으로 담음
 		var contsJson = JSON.stringify(conts);
@@ -1917,7 +1930,7 @@
 			fd.append('surveyContents', surveyContents);
 			
 			$.ajax({
-				url : '/tempStoreSvySecTitle/'+surveyTypeId,
+				url : '/upload/tempStoreSvySecTitle?surveyTypeId='+surveyTypeId,
 				data : fd,
 				//dataType : json,
 				type : 'POST',

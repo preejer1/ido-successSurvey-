@@ -253,7 +253,7 @@ exports.tempStoreSvySecTitle = function(req, res){
     });
     
     //설문조사 유형 id
-    var surveyTypeId = req.params.surveyTypeId;
+    var surveyTypeId = req.param('surveyTypeId');
 	
 	form.parse(req, function(err, fields, files){
 		//질문 값
@@ -414,7 +414,7 @@ exports.tempStoreSvySecTitle = function(req, res){
 						//var fileDir = new Array();
 						
 						//db file컬럼 정보
-						fileDir = '/upload_img/'+renameFile;
+						fileDir = '/images/builder/survey/second_question/'+renameFile;
 						//console.log('fileDir::'+fileDir);
 						//console.log('fileDir[j]::'+fileDir[j]);
 						
@@ -524,8 +524,10 @@ exports.tempStoreSvySecTitle = function(req, res){
 
 //중질문 삭제
 exports.deleteSurveyType = function(req, res){
+	var surveyTypeId = req.param('surveyTypeId');
+	console.log('surveyTypeId::'+surveyTypeId);
 	//설문 삭제시 컨텐츠 이미지들 삭제
-	client.query('SELECT survey_image_path FROM survey_contents_tb WHERE survey_type_id=?', [req.params.surveyTypeId], function(error, rst){
+	client.query('SELECT survey_image_path FROM survey_contents_tb WHERE survey_type_id=?', [surveyTypeId], function(error, rst){
 		for(var i in rst){
 			//console.log('survey_image_path'+rst[i].survey_image_path);
 			if(rst[i].survey_image_path!=null){
@@ -535,23 +537,25 @@ exports.deleteSurveyType = function(req, res){
 	});
 	
 	//return false;
-	client.query('DELETE FROM survey_type_tb WHERE survey_type_id=?', [req.params.surveyTypeId], function(error, rst){
-		console.log('surveyTypeId::'+req.params.surveyTypeId);
+	client.query('DELETE FROM survey_type_tb WHERE survey_type_id=?', [surveyTypeId], function(error, rst){
+		console.log('surveyTypeId::'+surveyTypeId);
 	});
 }
 
 //이미지일 때 중질문에 대한 해당 답변 삭제
 exports.deleteConts = function(req, res){
+	var contsId = req.param('contsId');
+	console.log('contsId::'+contsId);
 	//설문 컨텐츠 이미지 삭제
-	client.query('SELECT survey_image_path FROM survey_contents_tb WHERE survey_contents_id=?', [req.params.contsId], function(error, rst){
+	client.query('SELECT survey_image_path FROM survey_contents_tb WHERE survey_contents_id=?', [contsId], function(error, rst){
 		//console.log(rst[0].survey_image_path);
 		if(rst[0].survey_image_path!=null){
 			fs.unlinkSync('resources'+rst[0].survey_image_path);
 		}
 	});
 	
-	client.query('DELETE FROM survey_contents_tb WHERE survey_contents_id=?', [req.params.contsId], function(error, rst){
-		console.log('contsId::'+req.params.contsId);
+	client.query('DELETE FROM survey_contents_tb WHERE survey_contents_id=?', [contsId], function(error, rst){
+		console.log('contsId::'+contsId);
 	});
 }
 

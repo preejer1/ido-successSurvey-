@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
 <script src="../js/web/common/jquery-ui.js"></script>
 <link rel="stylesheet" href="../css/web/common/jquery-ui.css">  
 <!-- *******   Survey js / css  ********-->
@@ -14,10 +14,12 @@
 <link rel="stylesheet" type="text/css" href="/css/web/builder/survey/tabs.css" />
 <!-- 설문조사 css -->
 <link rel="stylesheet" type="text/css" href="/css/web/builder/survey/survey.css" />
+
 <!-- 대질문 js 선언 -->
-<script type="text/javascript" src="../js/web/builder/survey/surveyTitleForm.js"></script>  
+<script type="text/javascript" id="surveyTitleFormJs" ></script>  
 <!-- 중질문 js 선언 -->
-<script type="text/javascript" src="../js/web/builder/survey/surveySecondTitleForm.js"></script>  
+<script type="text/javascript" id="surveySecondTitleFormJs"></script> 
+<!-- Survey JS -->
 <script type="text/javascript">
   $(function() {
     var dialog, form;
@@ -35,17 +37,105 @@
             }
         },
         close: function() {
-            //form[ 0 ].reset();
-            //allFields.removeClass( "ui-state-error" );
+        	//컨텐츠 새창으로 다시 돌아가기
+			location.href="/upload/builder_contents?contentsId="+getUrlParameter('contentsId');
           }
      });
    
      //설문조사 추가 버튼
      $( "#add-survey" ).button().on( "click", function() {
+    	//대질문/중질문 js 추가
+    	 $('#surveyTitleFormJs').attr('src', '../js/web/builder/survey/surveyTitleForm.js');
+         $('#surveySecondTitleFormJs').attr('src', '../js/web/builder/survey/surveySecondTitleForm.js');
+         //설문조사 추가시 중질문 타이틀주기
+         $('#dialog-listSurvey').attr('title','IDO RESEARCH MAKE');
+         $('#dialog-listSurvey').children('#IDO-dialog-title').children('h1').text('설문추가하기');
          dialog.dialog( "open" );
      });
-    });
+  });
+  
+  //대질문 저장하기
+  function insertTitle() {
+  	
+  	//대질문 팝업창 -> 중질문 리스트 팝업창에 대질문 값 뿌리기 
+  	var titleDone = $('#surveyTitle').val();
+  	console.log('titleDone::'+titleDone);
+  	$('#titleDone').val(titleDone);
+  	
+  	//대질문 val 체크
+  	if($('#surveyTitle').val()==''){
+  		if($('.explain').val()==undefined){
+  			//$('#surveyTitle').after('<div><span id="surveyTitleValChkSpan" style="margin-left:-180px;">* 대질문을 입력해주세요.</span>');	
+  			$('#surveyTitle').after('<div><p class="surveyTitle"> <span class="explain"> 질문을 입력해주세요.</span> </p>');	
+  		}//if
+  	}else {
+  		$('.explain').remove();
+  	}//if
+  	
+  	if($('.explain').attr('class')!=undefined){
+  		return false;
+  	}//if
+  	
+  	//img val chk
+  	if($('#thumbnailDiv #thumbnailImg').attr('src')==''){
+  		alert('썸네일을 추가해주세요.');
+  		return false;
+  	}//if
+  	
+  	//FormData 선언
+  	var fd = new FormData();
+
+  	//cotentsId 값 받아오기
+  	var contentsId = getUrlParameter('contentsId');
+  	console.log('contentsId:::'+contentsId);
+  	fd.append('contentsId', contentsId);
+  	
+  	//대질문
+  	fd.append('surveyTitle', $('#surveyTitle').val());
+  	console.log($('#surveyTitle').val())
+  	var file = $('#surveyThumbnail').prop('files')[0];
+  	
+  	//파일 값
+  	fd.append('file', file);
+  	//return false;
+  	
+  	$.ajax({
+  		url : '/upload/insertSurveyTitle',
+  		data : fd,
+  		type : 'POST',
+  		processData : false,
+  		contentType : false,
+  		success : function(data){
+  			console.log(data[1]);
+  			console.log(data);
+  			
+  			//서버에서 가져온 surveyId 값을 value에 넣주기 
+  			var surveyId = data[0].surveyId;
+  			$('#surveyId').val(surveyId);
+  			
+  			dialog = $( "#dialog-listSurvey" ).dialog({
+  				autoOpen: true,
+  				height: 1000,
+  				width: 1000,
+  				modal: true,
+  				buttons: {
+  					//"저장": insertTitle,
+  					"닫기": function() {
+  						$( "#dialog-listSurvey" ).dialog( "close" );
+  						$( "#dialog-surveyTitle" ).dialog( "close" );
+  					}
+  				},
+  				close: function() {
+					//컨텐츠 새창으로 다시 돌아가기
+					location.href="/upload/builder_contents?contentsId="+contentsId;
+  				}
+  			});
+  		}
+  	});
+  }
 </script>
+<!-- Survey JS -->
+
 <script type="text/javascript">
 function delete_image(i){
   console.log(i);
@@ -124,71 +214,93 @@ ul{
     <input type="file" accept="image/*;capture=camera" name="file" id="image" style="display: none;"/>
     </div>
 </form>
-<!-- Survey  -->
+
+<!-- Survey 등록 팝업 띄우기 -->
 <button id="add-survey">설문조사 추가</button>
-  
-  <div id="dialog-surveyTitle" title="IDO RESEARCH MAKE">
-      <!-- <p class="validateTips">대질문 등록</p> -->
-    <span id="IDO-dialog-title"><h1>설문만들기</h1></span> 
-    <form>
-      <fieldset>
-        <!-- <div id="wrap"> 
-          <div id="testwrap">  -->
-            <div id="makeq" class="padding-fix">  
-              <!-- <span class="top">IDO RESEARCH MAKE </span> -->
-               <section> 
-                      <img src="../img/make_top_pic.png" alt="" /> 
-                      <h2>질문입력하기</h2>
-                      <!-- <p class="surveyTitle"> <span class="explain"> 질문을 입력해주세요.</span> </p>  -->
-                <input type="hidden" id="surveyId_title" value="">
-                <div id="titleDiv"></div>
-              </section>
-            </div> 
-            <!-- // makeq --> 
-          <!-- </div> 
-          //testwrap 
-        </div>
-        wrap --> 
-      </fieldset>
-    </form>
-  </div>
-   
-  <div id="dialog-listSurvey" title="IDO RESEARCH MAKE" style="display:none;">
-      <!-- <p class="validateTips">설문조사 리스트</p> -->
-      <span id="IDO-dialog-title"><h1>설문만들기</h1></span> 
-    <form>
-        <fieldset>
+<div id="dialog-surveyTitle" title="IDO RESEARCH MAKE">
+    <!-- <p class="validateTips">대질문 등록</p> -->
+  <span id="IDO-dialog-title"><h1>설문만들기</h1></span> 
+  <form>
+    <fieldset>
+      <!-- <div id="wrap"> 
+        <div id="testwrap">  -->
           <div id="makeq" class="padding-fix">  
-             <input type="text" id="titleDone" name="titleDone" disabled>  
-             <section class="category"> 
-                <div class="leftPic"><img src="../img/category_title_pic.png" width="130px" height="44px"alt="카테고리분류를 선택하세요"></div> 
-                  <div class="rightSelect">
-                      <select class="category">
-                      <option>항목</option>
-                      <option>항목</option>
-                      </select>
-                  </div><!-- //rightSelect --> 
-              </section><!-- //카테고리 선택 끝 --> 
-          <section class="choiceType">
-              <input type="hidden" id="surveyId">
-            <h1> 유형선택 </h1> <span class="addtion">설문의 유형을 선택해주세요. </span> 
-            <ul> 
-              <li><a href="#" class="crown" id="btn1" onclick="button1()"><span class="offTx">순위형</span></a></li> 
-              <li><a href="#" class="star" id="btn2" onclick="button2()"><span class="offTx">별점형</span></a></li>
-              <li><a href="#" class="choice" id="btn3" onclick="button3()"><span class="offTx">이중택일형</span></a></li> 
-              <li><a href="#" class="number" id="btn4" onclick="button4()"><span class="offTx">선택형</span></a></li> 
-              <li><a href="#" class="text" id="btn5" onclick="button5()"><span class="offTx">텍스트</span></a></li>  
-            </ul>
-          </section><!-- //choiceType -->   
-            <div id="surveyDiv"><!-- 전체 div -->
-              <!-- 설문조사 insert div -->
-              <div id="listDiv"></div><!-- 설문조사 list div -->
-            </div>
-          </div>
-        </fieldset>
-      </form>
-  </div>
-<!-- Survey  --> 
+            <!-- <span class="top">IDO RESEARCH MAKE </span> -->
+             <section> 
+			<img src="/images/common/builder/survey/make_top_pic.png" alt="" /> 
+			<h2>질문입력하기</h2>
+			<!-- <p class="surveyTitle"> <span class="explain"> 질문을 입력해주세요.</span> </p>  -->
+			<input type="hidden" id="surveyId_title" value="">
+			<div id="titleDiv"></div>
+            </section>
+          </div> 
+          <!-- // makeq --> 
+        <!-- </div> 
+        //testwrap 
+      </div>
+      wrap --> 
+    </fieldset>
+  </form>
+</div>
+<!-- Survey 등록 팝업 띄우기 -->
+
+<!-- 설문조사 수정 팝업 띄우기 -->
+<% data1.forEach(function(item, index) {%>
+	<div id="dialog-surveyTitle<%=index+1 %>" title="IDO RESEARCH UPDATE" style="display:none;">
+		<span id="IDO-dialog-title"><h1>설문수정하기</h1></span>
+		<form>
+			<fieldset>
+				<div id="makeq" class="padding-fix">  
+					<!-- <span class="top">IDO RESEARCH MAKE </span> -->
+					<section> 
+  						<img src="/images/common/builder/survey/make_top_pic.png" alt="" /> 
+       					<h2>질문입력하기</h2>
+						<input type="text" id="surveyId_title" value="<%=item.SURVEY_ID%>">
+						<div id="titleDiv<%=index+1 %>"></div>
+					</section>
+				</div>		
+			</fieldset>
+		</form>
+	</div>
+<% }); %>
+<!-- 설문조사 수정 팝업 띄우기 -->	
+<!-- 설문조사 등록/수정 중질문 팝업 띄우기 -->
+<div id="dialog-listSurvey" title="" style="display:none;">
+<span id="IDO-dialog-title"><h1></h1></span>
+	<form>
+   		<fieldset>
+	   		<div id="makeq" class="padding-fix">  
+	   			<input type="text" id="titleDone" name="titleDone" disabled>  
+	   			<section class="category"> 
+		        	<div class="leftPic"><img src="/images/common/builder/survey/category_title_pic.png" width="130px" height="44px"alt="카테고리분류를 선택하세요"></div> 
+		           	<div class="rightSelect">
+		                <select class="category">
+		                <option>항목</option>
+		                <option>항목</option>
+		                </select>
+		           	</div><!-- //rightSelect --> 
+		        </section><!-- //카테고리 선택 끝 --> 
+				<section class="choiceType">
+		    		<input type="hidden" id="surveyId">
+					<h1> 유형선택 </h1> <span class="addtion">설문의 유형을 선택해주세요. </span> 
+					<ul> 
+						<li><a href="#" class="crownOff" id="btn1" onclick="button1()"></a></li> 
+						<li><a href="#" class="starOff" id="btn2" onclick="button2()"></a></li>
+						<li><a href="#" class="choiceOff" id="btn3" onclick="button3()"></a></li> 
+						<li><a href="#" class="numberOff" id="btn4" onclick="button4()"></a></li> 
+						<li><a href="#" class="textOff" id="btn5" onclick="button5()"></a></li>    
+					</ul>
+				</section><!-- //choiceType -->   
+	    		<input type="hidden" id="surveyId"><br/>
+		  		<div class="surveyDiv"><!-- 전체 div -->
+	  				<div id="listDiv"></div><!-- 설문조사 list div -->
+	  				<!-- 설문조사 insert div -->
+		  		</div>
+	  		</div>
+    	</fieldset>
+  	</form>
+</div> 
+<!-- 설문조사 등록/수정 중질문 팝업 띄우기 -->
 <ul id="sortable"> <!-- 컨텐츠들은 이쪽으로 들어간다. -->
     <% if(data == null) {%>
       <% }else {%>
@@ -207,6 +319,230 @@ ul{
         <% } %>
       <% } %>
 </ul>
+<!-- 설문조사 등록/수정 중질문 팝업 띄우기 -->
+<!-- 설문조사 대질문 썸네일 view -->
+<div id="surveyTitleDiv" style="width:500px; margin-left:50px; text-align:center;">
+	<%if(data1!='') {%> 
+	<span style="font-size:1.1em; font-weight:700;">설문조사 썸네일</span> 
+	<%} %>
+</div>
+<!-- 설문조사 대질문 썸네일 view -->
+<!-- Survey JS -->
+<script type="text/javascript">
+<% data1.forEach(function(item, index) { %>
+	//대질문 썸네일과 타이틀 append
+	var surveyTitleHtml = '';
+	surveyTitleHtml += ''+
+						//'<input type="text" id="surveyId" value="<%=item.SURVEY_ID %>">'+
+						'<div class="surveyDelDiv" style="text-align:right;">'+
+							'<input type="image" id="delSurvey" src="/images/util_image/x.png" onclick="delSurvey(<%=item.SURVEY_ID %>);" style="width:15px; height:15px;">'+
+						'</div>'+
+						'<div class="surveyThumbDiv">'+
+				   			'<img class="surveyThumbnailImg" src="<%=item.SURVEY_THUMBNAIL %>" id="surveyThumbnailImg<%=index+1%>" style="width:500px; height:auto;">'+
+				   		'</div>'+
+				   		'<div class="surveyTitleDiv">'+
+				   			'<span><%=item.SURVEY_TITLE %></span>'+
+				   		'</div>'+
+					   '<br/>';
+	$('#surveyTitleDiv').append(surveyTitleHtml);
+	
+	//$(function() {
+		var dialog, form;
+		
+		dialog = $( "#dialog-surveyTitle<%=index+1%>" ).dialog({
+	      	autoOpen: false,
+	      	height: 800,
+	      	width: 980,
+	      	modal: true,
+	      	buttons: {
+	        	"다음": updateTitle,
+	        	"닫기": function() {
+	        		$( "#dialog-surveyTitle<%=index+1%>" ).dialog( "close" );
+	       		}
+	    	},
+	    	close: function() {
+	    		//컨텐츠 새창으로 다시 돌아가기
+				location.href="/upload/builder_contents?contentsId="+getUrlParameter('contentsId');
+	      	}
+		});
+		
+		//대질문 이미지 버튼 클릭
+		$( "#surveyThumbnailImg<%=index+1%>" ).button().on( "click", function() {
+			console.log('<%=index+1%>');
+			console.log('<%=item.SURVEY_ID%>');
+			//중질문 js 추가
+			$('#surveySecondTitleFormJs').attr('src', '../js/web/builder/survey/surveySecondTitleForm.js');
+			//설문조사 수정시 중질문 타이틀주기
+			$('#dialog-listSurvey').attr('title','IDO RESEARCH UPDATE');
+			$('#dialog-listSurvey').children('#IDO-dialog-title').children('h1').text('설문수정하기');
+			
+			//대질문 수정 팝업 open			
+			$( "#dialog-surveyTitle<%=index+1%>" ).dialog( "open" );
+			
+			//대질문 설문 조회하기 
+			$.ajax({
+				url : '/upload/selectSurveyTitle?surveyId=<%=item.SURVEY_ID%>',
+				type : 'GET',
+				success : function(data){
+					console.log(data);
+					
+					//서버에서 가져온 surveyId 값을 value에 넣주기 
+					var surveyId = data[0].SURVEY_ID;
+					console.log('대질문 설문 조회하기 surveyId::::'+surveyId);
+					$('#surveyId_title').val(surveyId);
+					
+					$('#titleDiv<%=index+1 %>').append('<input type="text" id="surveyTitle" name="surveyTitle" value="<%=item.SURVEY_TITLE%>"><div></div>'+
+														'<input type="file" id="surveyThumbnail<%=index+1 %>" name="surveyThumbnail" >'+
+														/* '<div class="thumbnailFileDiv"><button class="btn btn-primary btn-sm" id="thumbnailFileBtn<%=index+1 %>">썸네일</button></div>'+ */
+														'<div class="thumbnailDiv" id="thumbnailDiv<%=index+1 %>">'+
+															'<br/><div>* 썸네일 수정을 원하시면 이미지를 클릭해주세요.</div>'+
+							   								'<img class="thumbnailImg" id="thumbnailImg<%=index+1 %>" alt="thumbnailImg" src="<%=item.SURVEY_THUMBNAIL%>" style="width:300px; height:250px; cursor:pointer;"> '+
+								   					   '</div>'+
+														'<div>');
+					 
+					$('.thumbnailImg').click(function(e){
+						e.preventDefault();
+						$('#surveyThumbnail<%=index+1 %>').click();
+					});
+					
+					//input type=file 숨기기
+					$('#surveyThumbnail<%=index+1 %>').css('display', 'none');
+					
+					$('#surveyThumbnail<%=index+1 %>').change(function(){
+						if(this.files && this.files[0]){
+							var reader = new FileReader();
+							
+							reader.onload = function(e){
+								
+								$('.thumbnailDiv').css('display','inline-block');
+								$('.thumbnailDiv').append($('.thumbnailDiv #thumbnailImg<%=index+1 %>').attr('src', e.target.result));
+							}
+							reader.readAsDataURL(this.files[0]);
+						}//if
+					});
+						
+				},//end success
+				error : function(error){
+					console.log(error);
+				}
+			});//end ajax
+		});//대질문 이미지 click end
+
+		
+		//대질문 수정하기
+	    function updateTitle() {
+			
+			//대질문 팝업창 -> 중질문 리스트 팝업창에 대질문 값 뿌리기 
+	    	var titleDone = $('#surveyTitle').val();
+	    	console.log('titleDone::'+titleDone);
+	    	$('#titleDone').val(titleDone);
+			
+	    	//대질문 val 체크
+			if($('#surveyTitle').val()==''){
+				if($('.explain').val()==undefined){
+					//$('#surveyTitle').after('<div><span id="surveyTitleValChkSpan" style="margin-left:-180px;">* 대질문을 입력해주세요.</span>');
+					$('#surveyTitle').after('<div><p class="surveyTitle"> <span class="explain"> 질문을 입력해주세요.</span> </p>');
+				}//if
+			}else {
+				$('.explain').remove();
+			}//if
+			
+			if($('.explain').attr('class')!=undefined){
+				return false;
+			}//if
+			
+			//img val chk
+			if($('#thumbnailDiv #thumbnailImg').attr('src')==''){
+				alert('썸네일을 추가해주세요.');
+				return false;
+			}//if
+			
+			//FormData 선언
+			var fd = new FormData();
+			
+			//대질문
+			fd.append('surveyTitle', $('#surveyTitle').val());
+			
+			var file = $('input[name="surveyThumbnail"]').prop('files')[0];
+			console.log('file::'+file);
+			
+			//파일 값
+			fd.append('file', file);
+			
+			$.ajax({
+				url : '/upload/updateSurveyTitle?surveyId='+$('#surveyId_title').val(),
+				data : fd,
+				type : 'POST',
+				processData : false,
+				contentType : false,
+				success : function(data){
+					console.log(data[1]);
+					console.log(data);
+					
+					//서버에서 가져온 surveyId 값을 value에 넣주기 
+					var surveyId = data[0].SURVEY_ID;
+					console.log('surveyId::::'+surveyId);
+					$('#surveyId').val(surveyId);
+					
+					//설문조사 조회하기 
+					selectSurveyTitle();
+					
+					//설문조사 리스트 팝업창 
+					view_listSurvey();
+				}
+			});
+	    }
+		
+	  	//설문조사 대질문 삭제
+		function delSurvey(surveyId){
+			
+			var fd = new FormData();
+			fd.append('surveyId', surveyId);
+			
+			if(confirm('삭제하시겠습니까?') == true){
+				//해당 설문조사의 contsDiv 삭제
+				//$('#surveyDiv'+i+'').remove();
+				$.ajax({
+					url : '/upload/deleteSurveyTitle?surveyId='+surveyId,
+					data : fd,
+					type : 'POST',
+					processData : false,
+					contentType : false,
+					success : function(){
+						alert('설문조사가 삭제되었습니다.');
+						//컨텐츠 새창으로 다시 돌아가기
+						location.href="/upload/builder_contents?contentsId="+getUrlParameter('contentsId');
+					}//end success
+				});//end ajax
+			}else {
+				return false;
+			}//if
+		}
+		
+	    function view_listSurvey(){
+			dialog = $( "#dialog-listSurvey" ).dialog({
+				//url: '/views/surveySecondTitleForm',
+		      	autoOpen: true,
+		      	height: 1000,
+		      	width: 1000,
+		      	modal: true,
+		      	cache:false,
+		      	buttons: {
+		        	//"저장": insertTitle,
+		        	"닫기": function() {
+		        		//팝업 초기화 
+		        		closePopFunc();
+		       		}
+		    	},
+		    	close: function() {
+		      	}
+		    });
+		}
+	//});
+<% }); %> 
+</script>
+<!-- Survey JS -->
+
 <button onclick="save()">save</button>
 <script>
 $(document).ready(function(){

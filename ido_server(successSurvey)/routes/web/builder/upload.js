@@ -46,16 +46,30 @@ exports.upload_form = function(req,res){ // Upload 부분 (Get 요청시)
 		//builder_contents 작성부분
 		var contentsId = req.param('contentsId');
 		client.query('select CONTENTS_ID, LI_VALUE, CONTENTS_TYPE, CONTENTS_IMAGE_PATH, CONTENTS_IMAGE_ORIGIN, CONTENTS, ORDER_NUM from contents_image_tb where CONTENTS_ID=? ORDER BY ORDER_NUM', contentsId, function(e,r){
-			console.log('error : '+ e);
-			console.log('result : '+ r);
-			res.render('builder/contents/upload_contents.ejs',{data : r});
+			//console.log('error : '+ e);
+			//console.log('result : '+ r);
+			//res.render('builder/contents/upload_contents.ejs',{data : r});
+			client.query('SELECT SURVEY_ID, CONTENTS_ID, SURVEY_TITLE, SURVEY_THUMBNAIL FROM survey_tb WHERE contents_id=?', [contentsId], function(error, rst){
+				//결과 출력
+				console.log('error : '+ e);
+				console.log(r);
+				console.log('-------------');
+				console.log(rst);
+				res.render('builder/contents/upload_contents.ejs', {data:r, data1:rst});
+			});
 		});
 	}else if(req.params.id == 'update_builder_contents'){ //기존에 작성중이던 builder_contents에서 update를 위한 부분
 		var contentsId = req.param('contentsId');
 		client.query('select CONTENTS_ID, LI_VALUE, CONTENTS_TYPE, CONTENTS_IMAGE_PATH, CONTENTS_IMAGE_ORIGIN, CONTENTS, ORDER_NUM from contents_image_tb where CONTENTS_ID=? ORDER BY ORDER_NUM', contentsId, function(e,r){
-			console.log('error : '+ e);
-			console.log('result : '+ r);
-			res.render('builder/contents/adjust_contents.ejs',{data : r});
+			
+			client.query('SELECT SURVEY_ID, CONTENTS_ID, SURVEY_TITLE, SURVEY_THUMBNAIL FROM survey_tb WHERE contents_id=?', [contentsId], function(error, rst){
+				//결과 출력
+				console.log('error : '+ e);
+				console.log(r);
+				console.log('-------------');
+				console.log(rst);
+				res.render('builder/contents/adjust_contents.ejs', {data:r, data1:rst});
+			});
 		});
 	}else if(req.params.id == 'check_contents_image_id'){ //빌더부분에서 name값들을 지정하기 위해 가장 최근에 작성된 컨텐츠의 id값을 받아서 보내줌.
 		var contentsId = 1;
@@ -120,6 +134,89 @@ exports.upload_form = function(req,res){ // Upload 부분 (Get 요청시)
 			
 		});
 	}
+	
+	//대질문 리스트 view
+	if(req.params.id == 'listSurveyTitle'){
+		console.log('대질문 리스트 조회');
+		client.query('SELECT SURVEY_ID, CONTENTS_ID, SURVEY_TITLE, SURVEY_THUMBNAIL FROM survey_tb', function(error, rst){
+			console.log(rst);
+			//결과 출력
+			res.render('builder/survey/listSurveyTitle.ejs', { data : rst });
+		});
+	}
+	
+	//해당 컨텐츠에 대한 대질문 조회
+	/*
+	if(req.params.id == 'selectSurveyTitleByContsId'){
+		console.log('해당 컨텐츠에 대한 대질문  조회');
+		var contentsId = req.param('contentsId');
+		console.log('contentsId::'+contentsId);
+		client.query('SELECT SURVEY_ID, CONTENTS_ID, SURVEY_TITLE, SURVEY_THUMBNAIL FROM survey_tb WHERE contents_id=?', [contentsId], function(error, rst){
+			//결과 출력
+			res.json(rst);
+			//res.render('builder/contents/adjust_contents.ejs', {data1:r});
+		});
+	}
+	*/
+	
+	//대질문 수정 조회
+	if(req.params.id == 'selectSurveyTitle'){
+		console.log('대질문 수정 조회');
+		var surveyId = req.param('surveyId');
+		console.log('surveyId::'+surveyId);
+		console.log('surveyId 타입::'+typeof surveyId);
+		
+		//int로 변환
+		surveyId = parseInt(surveyId);
+		console.log('surveyId::'+req.param('surveyId'));
+		
+		//임시저장 조회 쿼리 실행
+		client.query('SELECT SURVEY_ID, SURVEY_TITLE, SURVEY_THUMBNAIL FROM survey_tb where survey_id=?',[surveyId], function(error, rst){
+			res.json(rst);
+		});
+	}
+	
+	//중질문 리스트 조회
+	if(req.params.id == 'listSurveySecondTitle'){
+		console.log('중질문 리스트 조회');
+		var surveyId = req.param('surveyId');
+		console.log('surveyId::'+surveyId);
+		console.log('surveyId 타입::'+typeof surveyId);
+		
+		//int로 변환
+		surveyId = parseInt(surveyId);
+		console.log('surveyId::'+req.param('surveyId'));
+		
+		var title = {};
+		
+		//임시저장 조회 쿼리 실행
+		client.query('SELECT SURVEY_TYPE_ID, SURVEY_TYPE, SURVEY_ANSWER_TYPE, SECOND_SURVEY_TITLE FROM SURVEY_TYPE_TB WHERE SURVEY_ID=?', [surveyId], function(error, rst){
+			//질문 tb 값
+			title = {"title":rst};
+			//배열 선언
+			var arr= new Array();
+			//console.log(rst[1]);
+			for(var i in rst){
+				client.query('SELECT SURVEY_CONTENTS_ID, SURVEY_CONTENTS, SURVEY_IMAGE_PATH FROM SURVEY_CONTENTS_TB WHERE SURVEY_TYPE_ID=?', [rst[i].SURVEY_TYPE_ID], function(error,rst1){
+					//arr 배열에 contents 결과값 담음
+					arr.push(rst1);
+					console.log('rst.length title의 값 개수 : '+rst.length);
+					console.log('arr.length contents 배열의 개수:'+arr.length);
+					console.log('i = title idx: '+ (parseInt(i)));
+					console.log('rst1.length 해당 title에 대한 contents의 개수: '+rst1.length);
+					//title의 값 개수 == contents 배열의 개수  
+					if(rst.length==arr.length){
+						//질문의 키 값 reply에 contents 결과값이 있는 배열을 담음
+						title.reply = arr;
+						console.log(title);
+						//console.log(title.reply);
+						//(질문 값+content 값)을 view로 보냄
+						res.json(title);
+					}//if
+				});	
+			}
+		});
+	}
 };
 
 
@@ -139,8 +236,20 @@ exports.post_upload = function(req,res){ // Upload 부분 (Post 요청시)
 		builder_contents.revise_contents(req, res); //최상단에 선언한 [var builder_contents 확인할 것]
 	}else if(req.params.id == 'update_builder_thumbnail'){ // update_thumbnail 부분
 		builder_thumbnail.revise_thumbnail(req, res);
-	}else if(req.params.id == 'insertSurveyTitle'){
-		viewSurveyTitle.surveyTitle(req, res)
+	}else if(req.params.id == 'insertSurveyTitle'){ //대질문 저장
+		viewSurveyTitle.insertSurveyTitle(req, res);
+	}else if(req.params.id == 'deleteSurveyTitle'){	//대질문 삭제
+		viewSurveyTitle.deleteSurveyTitle(req, res)
+	}else if(req.params.id == 'updateSurveyTitle'){	//대질문 수정
+		viewSurveyTitle.updateSurveyTitle(req, res);
+	}else if(req.params.id == 'insertSurveySecondTitle'){	//중질문 저장하기
+		viewSurveySecondTitle.insertSurveySecondTitle(req, res);	
+	}else if(req.params.id == 'tempStoreSvySecTitle'){	//중질문 임시저장
+		viewSurveySecondTitle.tempStoreSvySecTitle(req, res);
+	}else if(req.params.id == 'deleteSurveyType'){	//중질문 삭제
+		viewSurveySecondTitle.deleteSurveyType(req, res);
+	}else if(req.params.id == 'deleteConts'){	//중질문에 대한 해당 답변 삭제
+		viewSurveySecondTitle.deleteConts(req, res);
 	}
 }
 

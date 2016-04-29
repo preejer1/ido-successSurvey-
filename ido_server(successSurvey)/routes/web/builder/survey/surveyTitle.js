@@ -23,7 +23,7 @@ exports.surveyTitleForm = function(req, res){
 };
 
 //대질문 등록
-exports.surveyTitle = function(req, res){
+exports.insertSurveyTitle = function(req, res){
 	
 	//body 선언
 	var body = req.body;
@@ -54,6 +54,12 @@ exports.surveyTitle = function(req, res){
     });
 	
 	form.parse(req,function(err, fields, files){
+		
+		//컨텐츠 id 
+		var contentsId = fields.contentsId;
+		console.log('contentsId::'+contentsId);
+		
+		//대질문 타이틀
 		var surveyTitle = fields.surveyTitle;
 		console.log('surveyTitle::'+surveyTitle);
 		
@@ -115,13 +121,21 @@ exports.surveyTitle = function(req, res){
 		console.log('fileDir::::::::::::::::::'+fileDir);
 		////////////////////////////////////////////////////////
 	
-		//대질문 tb insert												//임시로 contents_id는 1로 insert 추후 변경
-		client.query('INSERT INTO survey_tb values(null, 1, ?, ?)', [surveyTitle, fileDir], function(error, rst){
+		//대질문 tb insert												//임시로 contents_id는 1로 insert 추후 변경(수정완료)
+		client.query('INSERT INTO survey_tb values(null, ?, ?, ?)', [contentsId, surveyTitle, fileDir], function(error, rst){
 			console.log('insert error::'+error);
 			//survey_id 값 가져오기
-			client.query('SELECT MAX(survey_id) AS surveyId FROM survey_tb', function(error, rst){
-				console.log('select error::'+error);
+			client.query('SELECT MAX(survey_id) as surveyId FROM survey_tb', function(error, rst){
+				//console.log(rst[0].surveyId);
+				console.log(rst);
 				res.json(rst);
+				/*
+				client.query('SELECT survey_id AS surveyId, contents_id, survey_title, survey_thumbnail FROM survey_tb WHERE survey_id=?', [rst[0].surveyId], function(error, rst){
+					console.log('select error::'+error);
+					res.json(rst);
+					console.log(rst);
+				});//end select query
+				*/
 			});//end select query
 		});//end insert query
 	});//end form parse
@@ -139,8 +153,11 @@ exports.listSurveyTitle = function(req, res){
 
 //대질문 삭제하기
 exports.deleteSurveyTitle = function(req, res){
+	var surveyId = req.param('surveyId');
+	console.log('surveyId::'+surveyId);
+	
 	//해당 대질문 설문에 대한 컨텐츠 이미지 삭제
-	client.query('select survey_type_id from survey_type_tb where survey_id=?', [req.params.surveyId], function(error, rst2){
+	client.query('select survey_type_id from survey_type_tb where survey_id=?', [surveyId], function(error, rst2){
 		console.log(rst2);
 		for(var i in rst2){
 			console.log(rst2[i].survey_type_id);
@@ -159,18 +176,19 @@ exports.deleteSurveyTitle = function(req, res){
 		}//for
 		
 		//survey_image_path를 먼저 select한 후에 해야 되어 밑에 쿼리를 select쿼리 안에 넣은거임   
-		//=> req.params.surveyId를 먼저 검색되므로  survey_image_path를 먼저 찾은 후에 아래의 쿼리가 실행
+		//=> surveyId를 먼저 검색되므로  survey_image_path를 먼저 찾은 후에 아래의 쿼리가 실행
 		///////////////////////////////////////////////////////
-		client.query('DELETE FROM survey_tb WHERE survey_id=?', [req.params.surveyId], function(error, rst){
-			console.log('surveyId::'+req.params.surveyId);
+		client.query('DELETE FROM survey_tb WHERE survey_id=?', [surveyId], function(error, rst){
+			console.log('surveyId::'+surveyId);
 			//리스트로 리다이렉트
-			res.redirect('/listSurveyTitle');
+			//res.redirect('/listSurveyTitle');
+			res.end();
 		});
 		///////////////////////////////////////////////////////
 	});//end query
 	
 	//설문 대질문 썸네일 삭제
-	client.query('SELECT survey_thumbnail FROM survey_tb WHERE survey_id=?', [req.params.surveyId], function(error, rst1){
+	client.query('SELECT survey_thumbnail FROM survey_tb WHERE survey_id=?', [surveyId], function(error, rst1){
 		console.log('썸네일 삭제 파일:'+rst1[0].survey_thumbnail);
 		if(rst1[0].survey_thumbnail!=null){
 			fs.unlinkSync('resources'+rst1[0].survey_thumbnail);
@@ -198,12 +216,15 @@ exports.selectSurveyTitle = function(req, res){
 
 //대질문 수정 
 exports.updateSurveyTitle = function(req, res){
+	
 	//body 선언
 	var body = req.body;
 	console.log('대질문:'+body.surveyTitle);
 	
 	//surveyId 값 선언
-	var surveyId = req.params.surveyId;
+	console.log('ffff');
+	var surveyId = req.param('surveyId');
+	console.log('surveyId:::'+surveyId);
 	
 	var form = new formidable.IncomingForm();
 	var files = [];	//파일 선언

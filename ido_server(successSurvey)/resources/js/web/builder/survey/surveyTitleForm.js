@@ -1,9 +1,10 @@
+
 $(document).ready(function(){
 	$('#titleDiv').append('<input type="text" id="surveyTitle" name="surveyTitle"><div></div>'+
 							'<input type="file" id="surveyThumbnail" name="surveyThumbnail" >'+
 							/*'<div class="thumbnailFileDiv"><button class="btn btn-primary btn-sm" id="thumbnailFileBtn">썸네일</button></div><div></div>'+*/
-							'<div class="thumbnailDiv" id="thumbnailDiv">'+
-   								'<br/><img class="thumbnailImg" id="thumbnailImg" alt="클릭" src="#" style="width:300px; height:250px; border:1px solid grey; cursor:pointer;"> '+
+							'<div class="thumbnailDiv" id="thumbnailDiv" style="border:none;">'+
+   								'<br/><img class="thumbnailImg" id="thumbnailImg" alt="" src="" style="background:url(/images/common/builder/survey/thumbnail_img_bg.png) no-repeat; border:none; width:350px; height:250px; cursor:pointer;">'+
 	   					   '</div>'+
 							'<div>');
 	
@@ -60,10 +61,13 @@ function insertTitle() {
 		return false;
 	}//if
 	
-//		var json = {'surveyTitle':$('#surveyTitle').val()};
-	
 	//FormData 선언
 	var fd = new FormData();
+
+	//cotentsId 값 받아오기
+	var contentsId = getUrlParameter('contentsId');
+	console.log('contentsId:::'+contentsId);
+	fd.append('contentsId', contentsId);
 	
 	//대질문
 	fd.append('surveyTitle', $('#surveyTitle').val());
@@ -99,7 +103,8 @@ function insertTitle() {
 					"닫기": function() {
 						$( "#dialog-listSurvey" ).dialog( "close" );
 						$( "#dialog-surveyTitle" ).dialog( "close" );
-						location.href="/viewSurveyTitle";
+						//컨텐츠 새창으로 다시 돌아가기
+						location.href="/upload/builder_contents?contentsId="+contentsId;
 					}
 				},
 				close: function() {
