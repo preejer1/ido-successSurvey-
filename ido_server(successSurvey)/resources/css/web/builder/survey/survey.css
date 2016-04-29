@@ -58,7 +58,7 @@ form fieldset{
 #makeq section.choiceType ul li.on{background:#8fbeec; color:#fff;} 
 #makeq section.choiceType .onTx {display:inline-block; color:#fff; font-family:'Nanum Barun Gothic',sans-serif; font-weight:700; margin-top:70px;}
 #makeq section.choiceType .offTx {display:inline-block; color:#515151; font-family:'Nanum Barun Gothic',sans-serif; font-weight:700; margin-top:70px;}
-  
+
 #makeq section.mquestion {width:910px; height:auto; padding:0 0 20px 0; text-align:left; border:none;} 
 #makeq section.mquestion .mwrap{width:100%; height:auto; padding:20px; text-align:left; border:2px solid #e7e7e7; border-radius:15px; box-sizing:border-box; -moz-box-sizing:border:box;} 
 #makeq section.mquestion .mwrap .mcon{position:relative; width:100%; height:auto; padding:10px; text-align:left; box-sizing:border-box; -moz-box-sizing:border:box;} 
@@ -358,7 +358,7 @@ input[class*=gradeBtn] {
 	display: inline-block;
     width: 28px;
     height: 28px;
-    background: url('/images/common/builder/survey/mq_pic_bt.png') no-repeat;
+    background: url('/images/common/builder/survey/mq_star_bt.png') no-repeat;
     border: none;
     coursor: pointer;
     vertical-align: middle; /*0427 이미지 가운데 정렬*/ 

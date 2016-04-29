@@ -11,7 +11,7 @@
 			value=val;
 		};
 	}
-	 
+	
 	function getUrlParameter(sParam){ //View에 URL에 접근하여 get parameter값을 가져옴
 		var sPageURL = window.location.search.substring(1);
 	  	var sURLVariables = sPageURL.split('&');
@@ -21,8 +21,8 @@
           	return sParameterName[1];
         	}//if
 	  	}//for
-	}   
-    
+	}
+
 	//설문조사 리스트 조회하기
 	function selectSurveyTitle(){
 		$.ajax({
@@ -145,7 +145,17 @@
 		btn4Click = false;
 		btn5Click = false;
 		
-		//$("#btn1").attr('onclick', '').unbind('click');
+		//유형 선택 버튼 click 초기화
+		$("#btn1").attr('onclick', '').unbind('click');
+		$("#btn2").attr('onclick', '').unbind('click');
+		$("#btn3").attr('onclick', '').unbind('click');
+		$("#btn4").attr('onclick', '').unbind('click');
+		$("#btn5").attr('onclick', '').unbind('click');
+		$("#btn1").attr('onclick', 'button1()').bind('click');
+		$("#btn2").attr('onclick', 'button2()').bind('click');
+		$("#btn3").attr('onclick', 'button3()').bind('click');
+		$("#btn4").attr('onclick', 'button4()').bind('click');
+		$("#btn5").attr('onclick', 'button5()').bind('click');
 		
 		console.log('btn1Cnt:::::'+btn1Cnt);
 		console.log('btn2Cnt:::::'+btn2Cnt);
@@ -157,13 +167,14 @@
 	//텍스트/이미지 val 체크 함수
 	function valChkFunc(){
 		//validation span 체크
-		if($('li[rel="tab1"]').attr('class')=='active visitd'){
+		if($('li[rel="tab1"]').attr('class')=='active'){
 			txtValChk();
 			return false;
-		}else if($('li[rel="tab2"]').attr('class')=='active visitd'){
+		}else if($('li[rel="tab2"]').attr('class')=='active'){
 			imgValChk();
 			return false;
 		}else if(btn5Click==true){
+			console.log('텍스트형 val chk!!!!');
 			txtValChk();
 			return false;
 		}//if
@@ -228,7 +239,7 @@
 		$('#btn1').on('click', function(){
 			//별점형 클릭시 체크
 			if(btn1Cnt>0){
-				//alert('먼저 저장을 해주세요.');
+				alert('설문지를 먼저 작성해주세요.');
 				
 				//validation span 체크
 				valChkFunc();
@@ -237,7 +248,7 @@
 		$('#btn2').on('click', function(){
 			//별점형 클릭시 체크
 			if(btn2Cnt>0){
-				//alert('먼저 저장을 해주세요.');
+				alert('설문지를 먼저 작성해주세요.');
 				
 				//validation span 체크
 				valChkFunc();
@@ -246,25 +257,25 @@
 		$('#btn3').on('click', function(){
 			//택일형 클릭시 체크
 			if(btn3Cnt>0){
-				//alert('먼저 저장을 해주세요.');
+				alert('설문지를 먼저 작성해주세요.');
 				
 				//validation span 체크
 				valChkFunc();
 			}//if
 		});
 		$('#btn4').on('click', function(){
-			//택일형 클릭시 체크
+			//선택형 클릭시 체크
 			if(btn4Cnt>0){
-				//alert('먼저 저장을 해주세요.');
+				alert('설문지를 먼저 작성해주세요.');
 				
 				//validation span 체크
 				valChkFunc();
 			}//if
 		});
 		$('#btn5').on('click', function(){
-			//택일형 클릭시 체크
+			//텍스트형 클릭시 체크
 			if(btn5Cnt>0){
-				//alert('먼저 저장을 해주세요.');
+				alert('설문지를 먼저 작성해주세요.');
 				
 				//validation span 체크
 				valChkFunc();
@@ -387,7 +398,8 @@
 					reloadPopFunc();
 				});
 			}//if
-		}else {
+		}
+		/*else {
 			//validation span 체크
 			txtValChk();	
 			//설문조사 등록
@@ -395,6 +407,7 @@
 				insertAjax();
 			}//if
 		}//if
+		 */	
 	}
 	
 	//택일형
@@ -452,7 +465,9 @@
 					reloadPopFunc();
 				});
 			}//if
-		}else {
+		}
+		/*
+		else {
 			//validation span 체크
 			txtValChk();
 			//설문조사 등록
@@ -460,6 +475,7 @@
 				insertAjax();
 			}//if
 		}//if
+		*/
 	}
 	
 	//선택형
@@ -517,7 +533,9 @@
 					reloadPopFunc();
 				});
 			}//if
-		}else {
+		}
+		/*
+		else {
 			//validation span 체크
 			txtValChk();
 			//설문조사 등록
@@ -525,6 +543,7 @@
 				insertAjax();
 			}//if
 		}//if
+		*/
 	}
 	
 	//텍스트형
@@ -582,7 +601,9 @@
 					reloadPopFunc();
 				});
 			}//if
-		}else {
+		}
+		/*
+		else {
 			//validation span 체크
 			txtValChk();
 			//설문조사 등록
@@ -590,6 +611,7 @@
 				insertAjax();
 			}//if
 		}//if
+		*/
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////
@@ -1211,7 +1233,7 @@
 							'<h1> 질문입력 </h1> <span class="addtion">최대 8개까지 입력이 가능합니다.</span> '+
 							'<div id="container">'+
 								'<ul class="tabs">'+
-									'<li class="active visitd" rel="tab1">텍스트</li>'+
+									'<li class="active" rel="tab1">텍스트</li>'+
 									'<li rel="tab2">이미지</li>'+
 								'</ul>'+
 								'<div class="tab_container boxline">'+
@@ -1312,7 +1334,7 @@
 			//텍스트/이미지 탭				  
 			$('#insertDiv').append('<div id="container">'+
 									'<ul class="tabs">'+
-										'<li class="active visitd" rel="tab1">텍스트</li>'+
+										'<li class="active" rel="tab1">텍스트</li>'+
 										'<li rel="tab2">이미지</li>'+
 									'</ul>'+
 									'<div class="tab_container">'+
@@ -1457,6 +1479,8 @@
 		}else if(btn5Click==true){
 			var tabChk = '';
 		}//if
+		
+		console.log('tabChk:::'+tabChk);
 		
 		if($('#insertDiv').val()!=undefined){	//새로 등록할 때
 			//질문txt 값이 null이면
@@ -1693,7 +1717,7 @@
 		
 		//텍스트탭 insert
 		//질문txt와 내용1txt 내용2txt 모두 값이 있으면 db에 저장
-		if($('li[rel="tab1"]').attr('class')=='active visitd' || btn5Click==true){
+		if($('li[rel="tab1"]').attr('class')=='active' || btn5Click==true){
 		//if( $(tabChk+'#secondSurveyTitle1').val()!='' && $(tabChk+'#surveyContents1').val()!='' && $(tabChk+'#surveyContents2').val()!='' ){
 			console.log('tabChk::'+tabChk);
 			
@@ -1751,12 +1775,12 @@
 			//팝업 초기화 
 			reloadPopFunc();
 			
-		}else if($('li[rel="tab2"]').attr('class')=='active visitd'){
+		}else if($('li[rel="tab2"]').attr('class')=='active'){
 			
 			console.log('이미지 저장');
 			
 			//이미지탭일 경우
-			if($('li[rel="tab2"]').attr('class')=='active visitd'){
+			if($('li[rel="tab2"]').attr('class')=='active'){
 				var contsDivCnt = $('#tab2 div[id*="contsDiv"]').size();
 				console.log('contsDivCnt:::'+contsDivCnt);
 				if(contsDivCnt<2){
