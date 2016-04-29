@@ -481,10 +481,12 @@ button.ui-button::-moz-focus-inner {
 	left: 0;
 	padding: .2em;
 	outline: 0;
+	
 }
 .ui-dialog .ui-dialog-titlebar {
 	padding: .4em 1em;
 	position: relative;
+	
 }
 .ui-dialog .ui-dialog-title {
 	float: left;
@@ -496,6 +498,7 @@ button.ui-button::-moz-focus-inner {
 	/* 추가 */
 	text-align: center;
 	margin: 10px 0 0 50px;
+	
 }
 
 .ui-dialog .ui-dialog-titlebar-close {
@@ -520,6 +523,7 @@ button.ui-button::-moz-focus-inner {
 	background-image: none;
 	margin-top: .5em;
 	padding: .3em 1em .5em .4em;
+		
 }
 .ui-dialog .ui-dialog-buttonpane .ui-dialog-buttonset {
 	float: right;
@@ -527,7 +531,23 @@ button.ui-button::-moz-focus-inner {
 .ui-dialog .ui-dialog-buttonpane button {
 	margin: .5em .4em .5em 0;
 	cursor: pointer;
+
 }
+
+/*0426추가*/
+
+.ui-dialog .ui-dialog-buttonpane button .sur_closebt{
+	margin: .5em .4em .5em 0;
+	cursor: pointer;
+	background:url("/images/common/builder/survey/survey_nextbt.png") no-repeat; /*0426추가*/
+	border:1px solid #000;/*0426추가*/
+	width:80px;/*0426추가*/
+	height:30px;/*0426추가*/
+}
+
+
+
+
 .ui-dialog .ui-resizable-se {
 	width: 12px;
 	height: 12px;

@@ -16,7 +16,7 @@ var qs = require('querystring');	//쿼리스트링
 
 //중질문 리스트 가져오기
 exports.listSurveySecondTitle = function(req, res){
-	
+	      
 	var surveyId = req.param('surveyId');
 	console.log('surveyId::'+surveyId);
 	console.log('surveyId 타입::'+typeof surveyId);

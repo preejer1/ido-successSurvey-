@@ -12,10 +12,10 @@ $(document).ready(function(){
 		e.preventDefault();
 		$('#surveyThumbnail').click();
 	});
-	
+	 
 	//input type=file 숨기기
 	$('#surveyThumbnail').css('display', 'none');
-	
+	     
 	$('#surveyThumbnail').change(function(){
 		if(this.files && this.files[0]){
 			var reader = new FileReader();

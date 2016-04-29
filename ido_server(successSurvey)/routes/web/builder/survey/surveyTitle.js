@@ -16,12 +16,12 @@ exports.surveyForm = function(req, res){
 	res.render('builder/survey/surveyForm.ejs');
 }
 */
-
+      
 //대질문 등록폼 
 exports.surveyTitleForm = function(req, res){
 	res.render('builder/survey/surveyForm.ejs');
 };
-
+            
 //대질문 등록
 exports.insertSurveyTitle = function(req, res){
 	

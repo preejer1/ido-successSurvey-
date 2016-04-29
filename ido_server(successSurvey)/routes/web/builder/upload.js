@@ -19,7 +19,7 @@ var client = mysql.createConnection({
 	password : '1234',
 	database : 'ido'
 });
-
+    
 
 //upload위한 GET요청시 들어오는 곳
 exports.upload_form = function(req,res){ // Upload 부분 (Get 요청시)

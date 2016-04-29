@@ -11,7 +11,7 @@
 			value=val;
 		};
 	}
-	
+	 
 	function getUrlParameter(sParam){ //View에 URL에 접근하여 get parameter값을 가져옴
 		var sPageURL = window.location.search.substring(1);
 	  	var sURLVariables = sPageURL.split('&');
@@ -21,8 +21,8 @@
           	return sParameterName[1];
         	}//if
 	  	}//for
-	}
-
+	}   
+    
 	//설문조사 리스트 조회하기
 	function selectSurveyTitle(){
 		$.ajax({
