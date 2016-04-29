@@ -16,7 +16,7 @@ var qs = require('querystring');	//쿼리스트링
 
 //중질문 리스트 가져오기
 exports.listSurveySecondTitle = function(req, res){
-	      
+	
 	var surveyId = req.param('surveyId');
 	console.log('surveyId::'+surveyId);
 	console.log('surveyId 타입::'+typeof surveyId);
@@ -350,7 +350,7 @@ exports.tempStoreSvySecTitle = function(req, res){
 					
 					//////////////////////////////////////////////////////////
 					//이미지 파일 수정할 때
-					console.log('no::::'+no);
+					//console.log('no::::'+no);
 					
 					//해당 질문의 contents 추가시
 					for(var i in ContsTxtObj.surveyContents){
@@ -367,9 +367,12 @@ exports.tempStoreSvySecTitle = function(req, res){
 					}//for
 							
 					for(var no in contsJson){
-					//return false;
-						client.query('UPDATE survey_contents_tb SET survey_contents=?, survey_image_path=? WHERE survey_type_id=? and survey_contents_id=?', 
-								[contsJson[no].txtContsVal, fileDir, surveyTypeId, contsJson[no].contsId], function(error, rst){
+						//이미지 파일 수정할 때
+						console.log('no::::'+no);
+						console.log('contsJson[no].txtContsVal::'+contsJson[no].txtContsVal);
+						//return false;
+						client.query('UPDATE survey_contents_tb SET survey_image_path=? WHERE survey_type_id=? and survey_contents_id=?', 
+								[ fileDir, surveyTypeId, contsJson[no].contsId], function(error, rst){
 							//res.json(rst);
 							console.log(rst);
 							console.log(error);
@@ -453,8 +456,8 @@ exports.tempStoreSvySecTitle = function(req, res){
 							});//end query
 						}else if(contsJson[j].contsId!=null){
 							//이미지 파일 수정할 때
-							client.query('UPDATE survey_contents_tb SET survey_contents=?, survey_image_path=? WHERE survey_type_id=? and survey_contents_id=?', 
-									[contsJson[j].txtContsVal, fileDir, surveyTypeId, contsJson[j].contsId], function(error, rst){
+							client.query('UPDATE survey_contents_tb SET survey_image_path=? WHERE survey_type_id=? and survey_contents_id=?', 
+									[fileDir, surveyTypeId, contsJson[j].contsId], function(error, rst){
 								console.log('이미지 파일 여러개 update!!!!');
 							});//end query
 						}//if
@@ -547,12 +550,14 @@ exports.deleteConts = function(req, res){
 	var contsId = req.param('contsId');
 	console.log('contsId::'+contsId);
 	//설문 컨텐츠 이미지 삭제
-	client.query('SELECT survey_image_path FROM survey_contents_tb WHERE survey_contents_id=?', [contsId], function(error, rst){
-		//console.log(rst[0].survey_image_path);
-		if(rst[0].survey_image_path!=null){
-			fs.unlinkSync('resources'+rst[0].survey_image_path);
-		}
-	});
+	if(contsId != null){
+		client.query('SELECT survey_image_path FROM survey_contents_tb WHERE survey_contents_id=?', [contsId], function(error, rst){
+			//console.log(rst[0].survey_image_path);
+			if(rst[0].survey_image_path!=null){
+				fs.unlinkSync('resources'+rst[0].survey_image_path);
+			}
+		});
+	}
 	
 	client.query('DELETE FROM survey_contents_tb WHERE survey_contents_id=?', [contsId], function(error, rst){
 		console.log('contsId::'+contsId);

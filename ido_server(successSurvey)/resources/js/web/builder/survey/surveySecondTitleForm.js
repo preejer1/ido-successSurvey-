@@ -156,12 +156,15 @@
 		$("#btn3").attr('onclick', 'button3()').bind('click');
 		$("#btn4").attr('onclick', 'button4()').bind('click');
 		$("#btn5").attr('onclick', 'button5()').bind('click');
-		
 		console.log('btn1Cnt:::::'+btn1Cnt);
 		console.log('btn2Cnt:::::'+btn2Cnt);
 		console.log('btn3Cnt:::::'+btn3Cnt);
 		console.log('btn4Cnt:::::'+btn4Cnt);
 		console.log('btn5Cnt:::::'+btn5Cnt);
+		
+		//이미지 배열 초기화
+		imgArr = new Value();
+		console.log(imgArr.getValue());
 	}
 	
 	//텍스트/이미지 val 체크 함수
@@ -202,7 +205,7 @@
 	//팝업 close시 함수
 	function closePopFunc(){
 		//설문조사 리스트 팝업 close
-		$( "#dialog-listSurvey" ).dialog('close');
+		//$( "#dialog-listSurvey" ).dialog('close');
 		//설문조사 리스트 초기화
 		$('#listDiv').empty();
 		//등록 div 제거
@@ -1769,11 +1772,11 @@
 				processData : false,
 				contentType : false,
 				success : function(){
+					alert('설문지가 저장되었습니다.');
+					//팝업 초기화 
+					reloadPopFunc();
 				}//end success
 			});//end ajax
-			alert('설문지가 저장되었습니다.');
-			//팝업 초기화 
-			reloadPopFunc();
 			
 		}else if($('li[rel="tab2"]').attr('class')=='active'){
 			
@@ -1849,12 +1852,12 @@
 				processData : false,
 				contentType : false,
 				success : function(){
+					alert('설문지가 저장되었습니다.');
+					//팝업 초기화 
+					reloadPopFunc();
 				}//end success
 			});//end ajax
 			
-			alert('설문지가 저장되었습니다.');
-			//팝업 초기화 
-			reloadPopFunc();
 			
 		}//if
 	}
@@ -1887,17 +1890,20 @@
 				//var file = ($('#'+value[no]).children('input[name="surveyImagePath"]'))[no].files[0];
 				var file = $('#surveyDiv'+i+' input[type="file"]')[(contsNo-1)].files[0];
 				fd.append('file', file);
-				
 				//var file = $('#surveyDiv'+i+' input[type="file"]')[(fileLeng-1)].files[0];
 				//console.log(file);
-				//컨텐츠 내용 div id 값 선언
-				var txtContsDiv = $('#'+value[no]).children('#txtContsDiv'+(contsNo)+'').attr('id');
+				
+				//이미지일 경우 텍스트는 안받음(이미지만 받는다)
+				
+				//컨텐츠 내용 div id 값 선언 (이미지일시 텍스트 값 안받음 혹시 모르니 추후 삭제) 
+				//var txtContsDiv = $('#'+value[no]).children('#txtContsDiv'+(contsNo)+'').attr('id');
 				//컨텐츠 내용 값 
-				var txtContsVal = $('#'+txtContsDiv+'').children('input[name="surveyContents"]').val();
-				console.log('해당 no에 대한 txtContsVal:'+txtContsVal);
+				//var txtContsVal = $('#'+txtContsDiv+'').children('input[name="surveyContents"]').val();
+				//console.log('해당 no에 대한 txtContsVal:'+txtContsVal);
 				
 				//컨텐츠들을 담음
-				conts.push({'contsId':contsId, 'imgPathId':imgPathId, 'txtContsVal':txtContsVal});
+				conts.push({'contsId':contsId, 'imgPathId':imgPathId});
+				//conts.push({'contsId':contsId, 'imgPathId':imgPathId, 'txtContsVal':txtContsVal});
 				console.log(file);
 			}//for
 		}//if

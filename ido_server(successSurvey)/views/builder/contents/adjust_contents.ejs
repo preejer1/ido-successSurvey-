@@ -27,7 +27,7 @@
 <script type="text/javascript">
   $(function() {
     var dialog, form;
-         
+    
       //대질문 등록 팝업 
       dialog = $( "#dialog-surveyTitle" ).dialog({
           autoOpen: false,
@@ -507,6 +507,8 @@ function delete_image(i){ //x버튼누르면 사라짐.
 		      	buttons: {
 		        	//"저장": insertTitle,
 		        	"닫기": function() {
+		        		//설문조사 리스트 팝업 close
+		        		$( "#dialog-listSurvey" ).dialog('close');
 		        		//팝업 초기화 
 		        		closePopFunc();
 		       		}
