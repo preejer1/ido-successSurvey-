@@ -926,6 +926,20 @@
 					
 					$('#surveyImagePath'+(i+1)+'').change(function(){
 						for(var j=0; j<this.files.length; j++){
+							//확장자 구분
+							switch(this.files[j].name.substring(this.files[j].name.lastIndexOf('.') + 1).toLowerCase()){
+						        case 'jpg': case 'png':
+						            break;
+						        case 'gif':
+						        	alert('GIF 이미지는 사용하실 수 없습니다.');
+						        	return false;
+						        	//break;
+						        default:
+						            $(this).val('');
+						            // error message here
+						            alert("이미지 파일이 아닙니다.");
+						            break;
+						    }//switch
 							if(this.files && this.files[j]){
 								var reader = new FileReader();
 								//현재 surveyImagePath 값 담음
@@ -974,6 +988,21 @@
 						
 						$('#surveyImagePath'+(i+1)+'').change(function(){
 							for(var j=0; j<this.files.length; j++){
+								//확장자 구분
+								switch(this.files[j].name.substring(this.files[j].name.lastIndexOf('.') + 1).toLowerCase()){
+						        case 'jpg': case 'png':
+						            break;
+						        case 'gif':
+						        	alert('GIF 이미지는 사용하실 수 없습니다.');
+						        	return false;
+						        	//break;
+						        default:
+						            $(this).val('');
+						            // error message here
+						            alert("이미지 파일이 아닙니다.");
+						            break;
+								}//switch
+								
 								if(this.files && this.files[j]){
 									var reader = new FileReader();
 									
@@ -1032,6 +1061,20 @@
 					imgArr.setValue(readImgArr);
 					
 					for(var j=0; j<this.files.length; j++){
+						//확장자 구분
+						switch(this.files[j].name.substring(this.files[j].name.lastIndexOf('.') + 1).toLowerCase()){
+					        case 'jpg': case 'png':
+					            break;
+					        case 'gif':
+					        	alert('GIF 이미지는 사용하실 수 없습니다.');
+					        	return false;
+					        	//break;
+					        default:
+					            $(this).val('');
+					            // error message here
+					            alert("이미지 파일이 아닙니다.");
+					            break;
+					    }//switch
 						if(this.files && this.files[j]){
 							var reader = new FileReader();
 							//현재 surveyImagePath 값 담음

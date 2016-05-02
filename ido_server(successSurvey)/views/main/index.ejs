@@ -16,10 +16,16 @@
 <link href="http://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" rel='stylesheet' type='text/css'> 
 <!-- http://ionicons.com/ --> 
 
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<!-- 설문조사 팝업 js 추가  -->
+<script src="js/web/common/jquery-ui.js"></script>
+<link rel="stylesheet" href="css/web/common/jquery-ui.css">
+
 <link rel="stylesheet" type="text/css" href="css/web/main/common1.css" />
 <link rel="stylesheet" href="css/web/main/layout1024.css" media="screen and (max-width:1024px)">
 <link rel="stylesheet" href="css/web/main/mobile.css" media="screen and (max-width:600px)">
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<!-- <script src="//code.jquery.com/jquery-1.11.3.min.js"></script> -->	<!-- 주석처리 -->
 <script type="text/javascript" src="js/web/common/jquery-modal/jquery.modal.js"></script>
 <link rel="stylesheet" type="text/css" href="js/web/common/jquery-modal/jquery.modal.css" />
 
@@ -33,22 +39,56 @@
     function call_image(no){
       console.log('받는값 no::'+no);
       $.ajax({
-        url : 'http://172.16.75.5:5555/main_contents?no='+no+'',
+        url : 'http://172.16.75.7:5555/main_contents?no='+no+'',
         type : 'GET',
         success : function(data) {
   
           //처음 이미지 로딩 할 때 - no값 초기화 선언
           var no = 0;
-          
+          var firstCategory = new Array();
+          var secondCategory = new Array();
           //서버에서 데이터 응답받아 이미지 여러개 가져옴
           for(var i in data.contents){
+            firstCategory[i] = data.contents[i].CATEGORY.split('_')[0];
+            secondCategory[i] = data.contents[i].CATEGORY.split('_')[1];
+            
+            switch(firstCategory[i]){
+              case 'fashion':
+                  firstCategory[i]="패션/뷰티"
+                  break;
+              case 'food':
+                  firstCategory[i]= "음식/여행"
+                  break;    
+              case 'hobby':
+                  firstCategory[i]="취미/게임"
+                  break;    
+              case 'life':
+                  firstCategory[i]="생활/쇼핑"
+                  break;    
+              case 'edu':
+                  firstCategory[i]="정치/교육"
+                  break;    
+              case 'digital':
+                  firstCategory[i]="디지털/가전"
+                  break;    
+              case 'car':
+                  firstCategory[i]="자동차/교통"
+                  break;    
+              case 'media':
+                  firstCategory[i]="방송/연예"
+                  break;                            
+              case 'sports':
+                  firstCategory[i]="스포츠/건강"
+                  break;        
+            }
 
             if(data.contents[i].IMAGE_TYPE == 'type2'){
             $('.listwrap').append('<div class="conwrap">'+
                                     '<div class="liststyle03">'+
                                     '<div class="con">'+
-                                    '<p class="category_tx"><img src="img/list_category_icon.png" alt="카테고리">요리'+
-                                    '<span class="ion-ios-arrow-right"></span>레시피 </p>'+
+                                    '<p class="category_tx"><img src="img/list_category_icon.png" alt="카테고리">'+firstCategory[i]+
+                                    // '<span class="ion-ios-arrow-right"></span>' +
+                                    '</p>'+
                                     '<div class="title">'+
                                     '<h2 class="style02">'+data.contents[i].TITLE+'</h2>'+
                                     '</div>'+
@@ -58,7 +98,7 @@
                                     '</div>'+
                                     '<div class="bgpic"><img src="'+data.contents[i].THUMBNAIL_IMAGE_PATH+'" alt=""></div>'+
                                     '<div class="dateinfo">'+
-                                    '<img src="img/list_calendar_icon.png" alt=""> 2016.02.28<img src="img/list_reply_icon.png" alt="">  12121212'+
+                                    '<img src="img/list_calendar_icon.png" alt=""> '+data.contents[i].REG_DATE+'<img src="img/list_reply_icon.png" alt=""> '+data.contents[i].REG_DATE+
                                     '</div></div></div>');
             }else{
             console.log(data.contents[i].IMAGE_TYPE)
@@ -66,8 +106,8 @@
             $('.listwrap').append('<div class="conwrap">'+
                           '<div class="liststyle01">'+
                             '<p class="category_tx">'+
-                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_category_icon.png" alt="카테고리" /> 요리'+
-                              '<span class="ion-ios-arrow-right"></span>  레시피'+ 
+                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_category_icon.png" alt="카테고리" />'+ firstCategory[i]+
+                              // '<span class="ion-ios-arrow-right"></span>  '+ 
                             '</p>'+
                             '<div class="title">'+
                               '<h2>'+data.contents[i].TITLE+'</h2>'+
@@ -80,8 +120,8 @@
                               '<a href="/view_contents?contentsId='+data.contents[i].CONTENTS_ID+'" class="conopen" rel="modal:open"> 글 열기 </a>'+
                             '</div>'+
                             '<div class="dateinfo">'+
-                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_calendar_icon.png" alt="" /> 2016.02.28'+
-                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_reply_icon.png" alt="" />12121212'+
+                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_calendar_icon.png" alt="" />'+data.contents[i].REG_DATE+
+                              '<img src="http://cjstk76.80port.net/00/idtest2/img/list_reply_icon.png" alt="" />26'+
                             '</div>'+
                           '</div>'+
                           '</div>');
@@ -123,7 +163,7 @@
     
 
 </script>
-<script type="text/javascript" src="js/web/main/common/jquery.min.js"></script> 
+<!-- <script type="text/javascript" src="js/web/main/common/jquery.min.js"></script>  -->	<!-- 주석 처리 -->
 <script type="text/javascript" src="js/web/main/common/common.js"></script> 
 <script type="text/javascript" src="js/web/main/common/jquery.blockUI.js"></script> 
 

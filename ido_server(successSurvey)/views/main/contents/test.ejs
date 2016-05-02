@@ -1,3 +1,4 @@
+
 <div class="wrap"> 
   <div id="contentWrap"> 
  
@@ -58,7 +59,472 @@
                      <div class="txt"><%= data[i].CONTENTS %></div> 
                   </div> 
                 <%} %> 
+                
+                <!-- 설문조사 썸네일 -->
+                <% data1.forEach(function(item, index) { %>
+                <div id="surveyTitleDiv" style="width:500px; margin:0 auto;">
+					<%if(data1!='') {%> 
+						<span style="font-size:1.1em; font-weight:700;">설문시작하기</span> 
+							<div><input type="text" id="surveyId" value="<%=item.SURVEY_ID%>"></div>
+							<div class="surveyThumbDiv">
+					   			<img class="surveyThumbnailImg" src="<%=item.SURVEY_THUMBNAIL %>" id="surveyThumbnailImg<%=index+1%>" style="width:500px; height:auto;">
+					   		</div>
+					   		<div class="surveyTitleDiv">
+					   			<span><%=item.SURVEY_TITLE %></span>
+					   		</div>
+					<%} %>
+				</div>
+                <!-- 설문조사 썸네일 -->
+                
+                <!-- 설문조사 팝업 -->
+                <div id="dialog-survey<%=index+1%>" title="IDO RESEARCH" style="display:none;">
+	                <form>
+	                	<div class="selectSurveyDiv" id="selectSurveyDiv<%=index+1%>">
+	                	</div>
+	                </form>
+                </div>
+                <%}); %>
+                <!-- 설문조사 팝업 -->
+                
+<!-- survey js -->
+<script type="text/javascript">
 
+<% data1.forEach(function(item, index) { %>
+var dialog, form;
+
+dialog = $( "#dialog-survey<%=index+1%>" ).dialog({
+  	autoOpen: false,
+  	height: 700,
+  	width: 980,
+  	modal: true,
+  	buttons: {
+    	//"다음": updateTitle,
+    	"닫기": function() {
+    		$( "#dialog-survey<%=index+1%>" ).dialog( "close" );
+   		}
+	},
+	close: function() {
+		//컨텐츠 새창으로 다시 돌아가기
+    	//location.href="/upload/update_builder_contents?contentsId="+getUrlParameter('contentsId');
+  	}
+});
+
+	function selectSurvey(){
+		$.ajax({
+			url : '/upload/listSurveySecondTitle?surveyId=<%=item.SURVEY_ID %>',
+			type : 'GET',
+			success : function(data){
+				console.log(data);
+				console.log(data.title[0]);
+				
+				//title 값 for
+				for(var i in data.title){
+					//i값 숫자로 변환
+					i = parseInt(i);  
+					
+					//답변 타입 텍스트:1, 이미지:2
+					var answerType = data.title[i].SURVEY_ANSWER_TYPE;
+					
+					//설문 유형 타입
+					var surveyType = data.title[i].SURVEY_TYPE;
+					var surveyTypeTxt = '';
+					if(surveyType=='1'){
+						surveyTypeTxt = '순위형';
+					}else if(surveyType=='2'){
+						surveyTypeTxt = '별점형';
+					}else if(surveyType=='3'){
+						surveyTypeTxt = '이중택일형';
+					}else if(surveyType=='4'){
+						surveyTypeTxt = '선택형';
+					}else if(surveyType=='5'){
+						surveyTypeTxt = '텍스트형';
+					}//if
+					
+					//설문조사 조회 
+				 	var surveyHtml = ''+
+				 					   '<div id="surveyDiv'+(i+1)+'" class="surveyDiv" style="border:0px solid #000;">'+
+					 					   	'<input type="hidden" id="surveyAnswerType'+(i+1)+'" name="surveyAnswerType" value="'+answerType+'">'+
+											'<input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].SURVEY_TYPE_ID+'"/>'+
+											'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].SURVEY_TYPE+'">'+
+											'<div class="surveyTypeDiv" style="font-size:1.2em; font-weight:700;"><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
+				  							'<div class="surveyTitleDiv">'+
+				  								'<span class="titleSpan" id="titleSpan'+(i+1)+'" style="font-weight:700;">'+data.title[i].SECOND_SURVEY_TITLE+'</span>'+
+				  							'</div>'+
+				  							'<div></div>';
+					var j=0;
+					//contents 값 for
+			  		for(j in data.reply[i]){
+			  			j = parseInt(j);
+						var img = data.reply[i][j]['SURVEY_IMAGE_PATH']; 
+						surveyHtml +=	'<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(j+1)+'">'+
+				  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['SURVEY_CONTENTS_ID']+'">';
+				  		if(answerType=='1'){
+				  			surveyHtml +=	//'<div></div>'+
+							  				'<div class="contsTxtDiv">'+
+								  				'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+							  				'</div>';
+				  		}
+				  		if(answerType=='2'){
+				  			surveyHtml +=	
+					  						'<img class="img" src="'+data.reply[i][j]['SURVEY_IMAGE_PATH']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:160px;"/>'+
+					  						'<div class="contsTxtDiv">'+
+					  							'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+					  						'</div>';	
+				  		}//if			
+				  					    '</div>'; 
+					}//for
+			  	
+					surveyHtml += '    </div></br>';
+					 
+					//설문조사 조회 html append
+					$('#selectSurveyDiv'+(i+1)+'').append(surveyHtml);
+					
+					$('#selectSurveyDiv'+(i+1)+'').append('<input type="button" class="nextBtn" id="nextBtn'+(i+1)+'" value="다음"><br/>');
+					
+					//$('.selectSurveyDiv').append('하하하하');
+					
+				}//for	
+			},//end success
+			error : function(error){
+				console.log(error);
+			}
+		});//end ajax	
+	}
+
+	$('#surveyThumbnailImg<%=index+1%>').button().on('click',function(){
+		console.log('<%=index+1%>');
+		console.log('surveyId::'+$('#surveyId').val());
+		console.log('surveyId::<%=item.SURVEY_ID %>');
+		
+		$('#dialog-survey<%=index+1%>').dialog('open');
+		
+		$.ajax({
+			url : '/upload/listSurveySecondTitle?surveyId=<%=item.SURVEY_ID %>',
+			type : 'GET',
+			success : function(data){
+				console.log(data);
+				
+				//title 값 for
+				for(var i in data.title){
+					//i값 숫자로 변환
+					i = parseInt(i);  
+						
+					console.log('survey_type_id::'+data.title[i].SURVEY_TYPE_ID);
+					
+					//if()
+					
+					//설문 유형 타입
+					var surveyType = data.title[i].SURVEY_TYPE;
+					if(surveyType=='1'){
+						rankingType(data);
+					}else if(surveyType=='2'){
+						gradeType(data);
+					}else if(surveyType=='3'){
+						chooseType(data);
+					}else if(surveyType=='4'){
+						checkType(data);
+					}else if(surveyType=='5'){
+						textType(data);
+					}//if
+					
+					//title 값 for
+					for(var i in data.title){
+						//i값 숫자로 변환
+						i = parseInt(i);  
+						
+						//답변 타입 텍스트:1, 이미지:2
+						var answerType = data.title[i].SURVEY_ANSWER_TYPE;
+						
+						var surveyType = data.title[i].SURVEY_TYPE;
+						var surveyTypeTxt = '';
+						if(surveyType=='1'){
+							surveyTypeTxt = '순위형';
+						}else if(surveyType=='2'){
+							surveyTypeTxt = '별점형';
+						}else if(surveyType=='3'){
+							surveyTypeTxt = '이중택일형';
+						}else if(surveyType=='4'){
+							surveyTypeTxt = '선택형';
+						}else if(surveyType=='5'){
+							surveyTypeTxt = '텍스트형';
+						}//if
+					/* 
+						//설문조사 조회 
+					 	var surveyHtml = ''+
+					 					   '<div id="surveyDiv'+(i+1)+'" class="surveyDiv" style="border:0px solid #000;">'+
+						 					   	'<input type="hidden" id="surveyAnswerType'+(i+1)+'" name="surveyAnswerType" value="'+answerType+'">'+
+												'<input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].SURVEY_TYPE_ID+'"/>'+
+												'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].SURVEY_TYPE+'">'+
+												'<div class="surveyTypeDiv" style="font-size:1.2em; font-weight:700;"><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
+					  							'<div class="surveyTitleDiv">'+
+					  								'<span class="titleSpan" id="titleSpan'+(i+1)+'" style="font-weight:700;">'+data.title[i].SECOND_SURVEY_TITLE+'</span>'+
+					  							'</div>'+
+					  							'<div></div>';
+						var j=0;
+						//contents 값 for
+				  		for(j in data.reply[i]){
+				  			j = parseInt(j);
+							var img = data.reply[i][j]['SURVEY_IMAGE_PATH']; 
+							surveyHtml +=	'<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(j+1)+'">'+
+					  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['SURVEY_CONTENTS_ID']+'">';
+					  		if(answerType=='1'){
+					  			surveyHtml +=	//'<div></div>'+
+								  				'<div class="contsTxtDiv">'+
+									  				'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+								  				'</div>';
+					  		}
+					  		if(answerType=='2'){
+					  			surveyHtml +=	
+						  						'<img class="img" src="'+data.reply[i][j]['SURVEY_IMAGE_PATH']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:160px;"/>'+
+						  						'<div class="contsTxtDiv">'+
+						  							'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+						  						'</div>';	
+					  		}//if			
+					  					    '</div>'; 
+						}//for
+				  	
+						surveyHtml += '    </div></br>';
+						 
+						//설문조사 조회 html append
+						$('#selectSurveyDiv'+(i+1)+'').append(surveyHtml);
+						
+						$('#selectSurveyDiv'+(i+1)+'').append('<input type="button" class="nextBtn" id="nextBtn'+(i+1)+'" value="다음"><br/>');
+						
+						$('#selectSurveyDiv'+(i+1)+'').append('하하하하');
+						 */
+						
+					}//for
+					
+					
+					
+					
+				}//for	
+			},//end success
+			error : function(error){
+				console.log(error);
+			}
+		});//end ajax	
+	});
+	
+	function rankingType(data){
+		console.log('순위형::'+data);
+		//title 값 for
+		for(var i in data.title){
+			//i값 숫자로 변환
+			i = parseInt(i);  
+			
+			//답변 타입 텍스트:1, 이미지:2
+			var answerType = data.title[i].SURVEY_ANSWER_TYPE;
+			
+			var surveyType = data.title[i].SURVEY_TYPE;
+			var surveyTypeTxt = '';
+			if(surveyType=='1'){
+				surveyTypeTxt = '순위형';
+			}else if(surveyType=='2'){
+				surveyTypeTxt = '별점형';
+			}else if(surveyType=='3'){
+				surveyTypeTxt = '이중택일형';
+			}else if(surveyType=='4'){
+				surveyTypeTxt = '선택형';
+			}else if(surveyType=='5'){
+				surveyTypeTxt = '텍스트형';
+			}//if
+		
+			//설문조사 조회 
+		 	var surveyHtml = ''+
+		 					   '<div id="surveyDiv'+(i+1)+'" class="surveyDiv" style="border:0px solid #000;">'+
+			 					   	'<input type="hidden" id="surveyAnswerType'+(i+1)+'" name="surveyAnswerType" value="'+answerType+'">'+
+									'<input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].SURVEY_TYPE_ID+'"/>'+
+									'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].SURVEY_TYPE+'">'+
+									'<div class="surveyTypeDiv" style="font-size:1.2em; font-weight:700;"><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
+		  							'<div class="surveyTitleDiv">'+
+		  								'<span class="titleSpan" id="titleSpan'+(i+1)+'" style="font-weight:700;">'+data.title[i].SECOND_SURVEY_TITLE+'</span>'+
+		  							'</div>'+
+		  							'<div></div>';
+			var j=0;
+			//contents 값 for
+	  		for(j in data.reply[i]){
+	  			j = parseInt(j);
+				var img = data.reply[i][j]['SURVEY_IMAGE_PATH']; 
+				surveyHtml +=	'<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(j+1)+'">'+
+		  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['SURVEY_CONTENTS_ID']+'">';
+		  		if(answerType=='1'){
+		  			surveyHtml +=	//'<div></div>'+
+					  				'<div class="contsTxtDiv">'+
+						  				'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+					  				'</div>';
+		  		}
+		  		if(answerType=='2'){
+		  			surveyHtml +=	
+			  						'<img class="img" src="'+data.reply[i][j]['SURVEY_IMAGE_PATH']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:160px;"/>'+
+			  						'<div class="contsTxtDiv">'+
+			  							'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+			  						'</div>';	
+		  		}//if			
+		  					    '</div>'; 
+			}//for
+	  	
+			surveyHtml += '    </div></br>';
+			 
+			//설문조사 조회 html append
+			$('#selectSurveyDiv'+(i+1)+'').append(surveyHtml);
+			
+			$('#selectSurveyDiv'+(i+1)+'').append('<input type="button" class="nextBtn" id="nextBtn'+(i+1)+'" value="다음"><br/>');
+			
+			$('#selectSurveyDiv'+(i+1)+'').append('하하하하');
+		}//for
+		
+	}
+	
+	function gradeType(data){
+		console.log('별점형::'+data);
+	}
+	
+	function chooseType(data){
+		console.log('이중택일형::'+data);
+		
+		//title 값 for
+		for(var i in data.title){
+			//i값 숫자로 변환
+			i = parseInt(i);  
+			
+			//답변 타입 텍스트:1, 이미지:2
+			var answerType = data.title[i].SURVEY_ANSWER_TYPE;
+			
+			var surveyType = data.title[i].SURVEY_TYPE;
+			var surveyTypeTxt = '';
+			if(surveyType=='1'){
+				surveyTypeTxt = '순위형';
+			}else if(surveyType=='2'){
+				surveyTypeTxt = '별점형';
+			}else if(surveyType=='3'){
+				surveyTypeTxt = '이중택일형';
+			}else if(surveyType=='4'){
+				surveyTypeTxt = '선택형';
+			}else if(surveyType=='5'){
+				surveyTypeTxt = '텍스트형';
+			}//if
+		
+			//설문조사 조회 
+		 	var surveyHtml = ''+
+		 					   '<div id="surveyDiv'+(i+1)+'" class="surveyDiv" style="border:0px solid #000;">'+
+			 					   	'<input type="hidden" id="surveyAnswerType'+(i+1)+'" name="surveyAnswerType" value="'+answerType+'">'+
+									'<input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].SURVEY_TYPE_ID+'"/>'+
+									'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].SURVEY_TYPE+'">'+
+									'<div class="surveyTypeDiv" style="font-size:1.2em; font-weight:700;"><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
+		  							'<div class="surveyTitleDiv">'+
+		  								'<span class="titleSpan" id="titleSpan'+(i+1)+'" style="font-weight:700;">'+data.title[i].SECOND_SURVEY_TITLE+'</span>'+
+		  							'</div>'+
+		  							'<div></div>';
+			var j=0;
+			//contents 값 for
+	  		for(j in data.reply[i]){
+	  			j = parseInt(j);
+				var img = data.reply[i][j]['SURVEY_IMAGE_PATH']; 
+				surveyHtml +=	'<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(j+1)+'">'+
+		  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['SURVEY_CONTENTS_ID']+'">';
+		  		if(answerType=='1'){
+		  			surveyHtml +=	//'<div></div>'+
+					  				'<div class="contsTxtDiv">'+
+						  				'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+					  				'</div>';
+		  		}
+		  		if(answerType=='2'){
+		  			surveyHtml +=	
+			  						'<img class="img" src="'+data.reply[i][j]['SURVEY_IMAGE_PATH']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:160px;"/>'+
+			  						'<div class="contsTxtDiv">'+
+			  							'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+			  						'</div>';	
+		  		}//if			
+		  					    '</div>'; 
+			}//for
+	  	
+			surveyHtml += '    </div></br>';
+			 
+			//설문조사 조회 html append
+			$('#selectSurveyDiv'+(i+1)+'').append(surveyHtml);
+			
+			$('#selectSurveyDiv'+(i+1)+'').append('<input type="button" class="nextBtn" id="nextBtn'+(i+1)+'" value="다음"><br/>');
+			
+			$('#selectSurveyDiv'+(i+1)+'').append('하하하하');
+		}//for
+	}
+	
+	function checkType(data){
+		console.log('선택형::'+data);
+		
+		//title 값 for
+		for(var i in data.title){
+			//i값 숫자로 변환
+			i = parseInt(i);  
+			
+			//답변 타입 텍스트:1, 이미지:2
+			var answerType = data.title[i].SURVEY_ANSWER_TYPE;
+			
+			var surveyType = data.title[i].SURVEY_TYPE;
+			var surveyTypeTxt = '';
+			if(surveyType=='1'){
+				surveyTypeTxt = '순위형';
+			}else if(surveyType=='2'){
+				surveyTypeTxt = '별점형';
+			}else if(surveyType=='3'){
+				surveyTypeTxt = '이중택일형';
+			}else if(surveyType=='4'){
+				surveyTypeTxt = '선택형';
+			}else if(surveyType=='5'){
+				surveyTypeTxt = '텍스트형';
+			}//if
+		
+			//설문조사 조회 
+		 	var surveyHtml = ''+
+		 					   '<div id="surveyDiv'+(i+1)+'" class="surveyDiv" style="border:0px solid #000;">'+
+			 					   	'<input type="hidden" id="surveyAnswerType'+(i+1)+'" name="surveyAnswerType" value="'+answerType+'">'+
+									'<input type="hidden" id="surveyTypeId'+(i+1)+'" name="surveyTypeId" value="'+data.title[i].SURVEY_TYPE_ID+'"/>'+
+									'<input type="hidden" id="surveyType'+(i+1)+'" name="surveyType" value="'+data.title[i].SURVEY_TYPE+'">'+
+									'<div class="surveyTypeDiv" style="font-size:1.2em; font-weight:700;"><span class="surveyTypeTxt">'+surveyTypeTxt+'</span></div>'+
+		  							'<div class="surveyTitleDiv">'+
+		  								'<span class="titleSpan" id="titleSpan'+(i+1)+'" style="font-weight:700;">'+data.title[i].SECOND_SURVEY_TITLE+'</span>'+
+		  							'</div>'+
+		  							'<div></div>';
+			var j=0;
+			//contents 값 for
+	  		for(j in data.reply[i]){
+	  			j = parseInt(j);
+				var img = data.reply[i][j]['SURVEY_IMAGE_PATH']; 
+				surveyHtml +=	'<div class="contsDiv'+i+'" id="contsDiv'+(i+1)+'_'+(j+1)+'">'+
+		  							'<input type="hidden" id="surveyContentsId'+(j+1)+'" name="surveyContentsId" value="'+data.reply[i][j]['SURVEY_CONTENTS_ID']+'">';
+		  		if(answerType=='1'){
+		  			surveyHtml +=	//'<div></div>'+
+					  				'<div class="contsTxtDiv">'+
+						  				'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+					  				'</div>';
+		  		}
+		  		if(answerType=='2'){
+		  			surveyHtml +=	
+			  						'<img class="img" src="'+data.reply[i][j]['SURVEY_IMAGE_PATH']+'" id="img'+(i+1)+'_'+(j+1)+'" style="width:200px; height:160px;"/>'+
+			  						'<div class="contsTxtDiv">'+
+			  							'<span class="contsTxtSpan" id="contentsSpan'+(i+1)+'_'+(j+1)+'" >'+data.reply[i][j]['SURVEY_CONTENTS']+'</span>'+
+			  						'</div>';	
+		  		}//if			
+		  					    '</div>'; 
+			}//for
+	  	
+			surveyHtml += '    </div></br>';
+			 
+			//설문조사 조회 html append
+			$('#selectSurveyDiv'+(i+1)+'').append(surveyHtml);
+			
+			$('#selectSurveyDiv'+(i+1)+'').append('<input type="button" class="nextBtn" id="nextBtn'+(i+1)+'" value="다음"><br/>');
+			
+			$('#selectSurveyDiv'+(i+1)+'').append('하하하하');
+		}//for
+	}
+	
+	function textType(data){
+		console.log('텍스트형::'+data);
+	}
+<%}); %>
+</script>
           <!-- 댓글시작 --> 
         
             <div class="replywrap"> 
